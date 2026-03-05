@@ -29,6 +29,12 @@ export default function Home() {
     setTextB(textA)
   }
 
+  function handleClear() {
+    setTextA("")
+    setTextB("")
+    setResult(null)
+  }
+
   return (
     <div className="bg-background">
       <div className="mx-auto max-w-6xl px-4 py-6 space-y-6">
@@ -41,6 +47,7 @@ export default function Home() {
           onChangeB={setTextB}
           onSwap={handleSwap}
           onCompare={handleCompare}
+          onClear={handleClear}
         />
 
         <OptionsBar

@@ -13,6 +13,7 @@ interface InputPanelProps {
   onChangeB: (value: string) => void
   onSwap: () => void
   onCompare: () => void
+  onClear: () => void
 }
 
 export function InputPanel({
@@ -22,6 +23,7 @@ export function InputPanel({
   onChangeB,
   onSwap,
   onCompare,
+  onClear,
 }: InputPanelProps) {
   const overLimitA = textA.length > MAX_CHARS
   const overLimitB = textB.length > MAX_CHARS
@@ -81,9 +83,17 @@ export function InputPanel({
         </div>
       </div>
 
-      <div className="flex justify-center">
+      <div className="flex justify-center gap-2">
         <Button onClick={onCompare} disabled={!canCompare} className="px-8">
           比較
+        </Button>
+        <Button
+          variant="outline"
+          onClick={onClear}
+          disabled={textA.length === 0 && textB.length === 0}
+          className="px-8"
+        >
+          クリア
         </Button>
       </div>
     </div>
