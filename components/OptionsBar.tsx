@@ -14,7 +14,7 @@ export function OptionsBar({ wordMode, theme, onWordModeChange, onThemeChange }:
   return (
     <div className="flex flex-wrap gap-6 items-center text-sm">
       <div className="flex items-center gap-3">
-        <span className="font-medium">英単語モード:</span>
+        <span className="font-medium">比較モード:</span>
         <RadioGroup
           value={wordMode}
           onValueChange={(v) => onWordModeChange(v as WordMode)}
@@ -27,6 +27,10 @@ export function OptionsBar({ wordMode, theme, onWordModeChange, onThemeChange }:
           <label className="flex items-center gap-1.5 cursor-pointer">
             <RadioGroupItem value="extended" />
             拡張
+          </label>
+          <label className="flex items-center gap-1.5 cursor-pointer">
+            <RadioGroupItem value="char" />
+            文字
           </label>
         </RadioGroup>
       </div>

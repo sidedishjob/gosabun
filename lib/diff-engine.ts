@@ -18,6 +18,21 @@ export function splitText(text: string, mode: WordMode): DiffToken[] {
   const normalized = text.replace(/\r\n?/g, "\n")
   const replaced = normalized.replaceAll("\n", NEWLINE_MARKER)
 
+  if (mode === "char") {
+    const tokens: DiffToken[] = []
+    let remaining = replaced
+    while (remaining.length > 0) {
+      if (remaining.startsWith(NEWLINE_MARKER)) {
+        tokens.push({ value: NEWLINE_MARKER, type: "newline" })
+        remaining = remaining.slice(NEWLINE_MARKER.length)
+      } else {
+        tokens.push({ value: remaining[0], type: "char" })
+        remaining = remaining.slice(1)
+      }
+    }
+    return tokens
+  }
+
   const wordPattern =
     mode === "compat" ? /^([a-z]+|<\$>|&#?\w+;|[\s\S])/ : /^([A-Za-z]+|<\$>|&#?\w+;|[\s\S])/
 
