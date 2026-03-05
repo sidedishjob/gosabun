@@ -8,9 +8,27 @@ import { StatsRow } from "@/components/StatsRow"
 import { computeDiff } from "@/lib/diff-engine"
 import type { WordMode, Theme, DiffResult } from "@/lib/types"
 
+const SAMPLE_A = `吾輩は猫である。名前はまだ無い。
+どこで生れたかとんと見当がつかぬ。
+何でも薄暗いじめじめした所でニャーニャー泣いていた事だけは記憶している。
+This is a sample text for diff comparison.
+The quick brown fox jumps over the lazy dog.
+MacDonaldさんはNewYorkからの手紙を読んだ。
+この行は削除されます。
+数値: 12345`
+
+const SAMPLE_B = `吾輩は犬である。名前はもうある。
+どこで生まれたかとんと見当がつかぬ。
+何でも薄暗いじめじめした所でワンワン泣いていた事だけは記憶している。
+This is a Sample Text for diff Comparison.
+The quick brown cat jumps over the lazy dog.
+MacArthurさんはNewJerseyからの手紙を読んだ。
+この行は追加されました。
+数値: 12346`
+
 export default function Home() {
-  const [textA, setTextA] = useState("")
-  const [textB, setTextB] = useState("")
+  const [textA, setTextA] = useState(SAMPLE_A)
+  const [textB, setTextB] = useState(SAMPLE_B)
   const [wordMode, setWordMode] = useState<WordMode>("compat")
   const [theme, setTheme] = useState<Theme>("color1")
   const [result, setResult] = useState<DiffResult | null>(null)

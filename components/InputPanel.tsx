@@ -45,7 +45,7 @@ export function InputPanel({
             value={textA}
             onChange={(e) => onChangeA(e.target.value)}
             placeholder="比較するテキストを入力..."
-            className="min-h-[200px] font-mono text-sm"
+            className="min-h-50 font-mono text-sm"
           />
           {overLimitA && (
             <p className="text-xs text-destructive">
@@ -73,7 +73,7 @@ export function InputPanel({
             value={textB}
             onChange={(e) => onChangeB(e.target.value)}
             placeholder="比較するテキストを入力..."
-            className="min-h-[200px] font-mono text-sm"
+            className="min-h-50 font-mono text-sm"
           />
           {overLimitB && (
             <p className="text-xs text-destructive">
