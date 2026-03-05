@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { InputPanel } from "@/components/InputPanel"
 import { OptionsBar } from "@/components/OptionsBar"
 import { DiffViewer } from "@/components/DiffViewer"
@@ -37,10 +37,25 @@ export default function Home() {
     document.documentElement.setAttribute("data-theme", theme)
   }, [theme])
 
-  function handleCompare() {
+  const canCompare =
+    textA.length > 0 && textB.length > 0 && textA.length <= 200_000 && textB.length <= 200_000
+
+  const handleCompare = useCallback(() => {
+    if (!canCompare) return
     const r = computeDiff(textA, textB, wordMode)
     setResult(r)
-  }
+  }, [textA, textB, wordMode, canCompare])
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+        e.preventDefault()
+        handleCompare()
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [handleCompare])
 
   function handleSwap() {
     setTextA(textB)

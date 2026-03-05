@@ -45,7 +45,7 @@ export function InputPanel({
             value={textA}
             onChange={(e) => onChangeA(e.target.value)}
             placeholder="比較するテキストを入力..."
-            className="min-h-50 font-mono text-sm"
+            className="field-sizing-fixed! h-80 resize-none overflow-y-auto font-mono text-sm"
           />
           {overLimitA && (
             <p className="text-xs text-destructive">
@@ -73,7 +73,7 @@ export function InputPanel({
             value={textB}
             onChange={(e) => onChangeB(e.target.value)}
             placeholder="比較するテキストを入力..."
-            className="min-h-50 font-mono text-sm"
+            className="field-sizing-fixed! h-80 resize-none overflow-y-auto font-mono text-sm"
           />
           {overLimitB && (
             <p className="text-xs text-destructive">
@@ -96,6 +96,12 @@ export function InputPanel({
           クリア
         </Button>
       </div>
+      <p className="text-center text-xs text-muted-foreground">
+        <kbd className="rounded border px-1 py-0.5 text-[10px]">⌘</kbd>
+        <span className="mx-0.5">+</span>
+        <kbd className="rounded border px-1 py-0.5 text-[10px]">Enter</kbd>
+        <span className="ml-1">で比較</span>
+      </p>
     </div>
   )
 }
