@@ -30,7 +30,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background">
       <div className="mx-auto max-w-6xl px-4 py-6 space-y-6">
         <h1 className="text-2xl font-bold">gosabun - テキスト差分比較</h1>
 
