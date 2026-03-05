@@ -40,3 +40,6 @@ next-env.d.ts
 
 # idea
 .idea
+
+# AI agent task files (temporary)
+docs/tasks/
