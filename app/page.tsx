@@ -8,23 +8,27 @@ import { StatsRow } from "@/components/StatsRow"
 import { computeDiff } from "@/lib/diff-engine"
 import type { WordMode, Theme, DiffResult } from "@/lib/types"
 
-const SAMPLE_A = `吾輩は猫である。名前はまだ無い。
-どこで生れたかとんと見当がつかぬ。
-何でも薄暗いじめじめした所でニャーニャー泣いていた事だけは記憶している。
-This is a sample text for diff comparison.
+const SAMPLE_A = `探偵の田中は、深夜12時に依頼人から電話を受けた。
+「ダイヤモンドが消えた」と声は震えていた。
+現場はNewYorkの高級ホテル、MacDonald Suiteの305号室。
+The suspect left no fingerprints at the scene.
+部屋には不審な足跡と、半分飲まれたワインが残されていた。
+金庫は無傷のまま、窓だけが開け放たれていた。
 The quick brown fox jumps over the lazy dog.
-MacDonaldさんはNewYorkからの手紙を読んだ。
-この行は削除されます。
-数値: 12345`
+田中は静かにメモを取りながら、容疑者を絞り込んでいった。
+容疑者リスト: 3名
+この行はオリジナルにのみ存在する。`
 
-const SAMPLE_B = `吾輩は犬である。名前はもうある。
-どこで生まれたかとんと見当がつかぬ。
-何でも薄暗いじめじめした所でワンワン泣いていた事だけは記憶している。
-This is a Sample Text for diff Comparison.
+const SAMPLE_B = `探偵の鈴木は、深夜12時に依頼人から電話を受けた。
+「エメラルドが消えた」と声は震えていた。
+現場はNewJerseyの高級ホテル、MacArthur Suiteの305号室。
+The Suspect left no Fingerprints at the scene.
+部屋には不審な足跡と、半分飲まれたワインが残されていた。
+金庫は無傷のまま、窓だけが開け放たれていた。
 The quick brown cat jumps over the lazy dog.
-MacArthurさんはNewJerseyからの手紙を読んだ。
-この行は追加されました。
-数値: 12346`
+鈴木は静かにメモを取りながら、容疑者を絞り込んでいった。
+容疑者リスト: 5名
+この行は改訂版にのみ存在する。`
 
 export default function Home() {
   const [textA, setTextA] = useState(SAMPLE_A)
