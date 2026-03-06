@@ -41,11 +41,16 @@ interface DiffRowProps {
   a: DiffCellModel
   b: DiffCellModel
   rowIndex: number
+  changed?: boolean
+  highlighted?: boolean
 }
 
-export function DiffRow({ a, b, rowIndex }: DiffRowProps) {
+export function DiffRow({ a, b, rowIndex, changed, highlighted }: DiffRowProps) {
   return (
-    <div className="diff-row">
+    <div
+      className={`diff-row${highlighted ? " diff-row-highlighted" : ""}`}
+      {...(changed ? { "data-diff-changed": rowIndex } : {})}
+    >
       <div className="diff-cell diff-cell-a">
         <span className="diff-line-num">{rowIndex + 1}</span>
         <span className="diff-cell-content">{renderCell(a, "a")}</span>

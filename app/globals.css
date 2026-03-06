@@ -193,3 +193,10 @@
   background-color: var(--diff-highlight-bg);
   color: var(--diff-highlight-text);
 }
+
+.diff-row-highlighted {
+  background-color: oklch(0.95 0.07 85);
+  box-shadow:
+    inset 3px 0 0 0 oklch(62.541% 0.09336 89.605),
+    inset -3px 0 0 0 oklch(0.7 0.15 85);
+}
