@@ -1,24 +1,28 @@
 "use client"
 
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import type { WordMode, Theme, DiffDisplayMode } from "@/lib/types"
+import type { WordMode, Theme, DiffDisplayMode, IgnoreOptions } from "@/lib/types"
 
 interface OptionsBarProps {
   wordMode: WordMode
   theme: Theme
   displayMode: DiffDisplayMode
+  ignoreOptions: IgnoreOptions
   onWordModeChange: (mode: WordMode) => void
   onThemeChange: (theme: Theme) => void
   onDisplayModeChange: (mode: DiffDisplayMode) => void
+  onIgnoreOptionsChange: (options: IgnoreOptions) => void
 }
 
 export function OptionsBar({
   wordMode,
   theme,
   displayMode,
+  ignoreOptions,
   onWordModeChange,
   onThemeChange,
   onDisplayModeChange,
+  onIgnoreOptionsChange,
 }: OptionsBarProps) {
   return (
     <div className="flex flex-wrap gap-6 items-center text-sm">
@@ -81,6 +85,22 @@ export function OptionsBar({
             差分のみ
           </label>
         </RadioGroup>
+      </div>
+      <div className="flex items-center gap-3">
+        <span className="font-medium">無視:</span>
+        <label className="flex items-center gap-1.5 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={ignoreOptions.ignoreTrimWhitespace}
+            onChange={(e) =>
+              onIgnoreOptionsChange({
+                ...ignoreOptions,
+                ignoreTrimWhitespace: e.target.checked,
+              })
+            }
+          />
+          行頭・行末の空白
+        </label>
       </div>
     </div>
   )

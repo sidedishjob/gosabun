@@ -8,6 +8,7 @@ import type {
   DiffResult,
   TokenType,
   WordMode,
+  IgnoreOptions,
 } from "./types"
 
 const MAX_CHARS = 200_000
@@ -242,7 +243,48 @@ function buildRows(chunks: DiffChunk[]): DiffRowModel[] {
   return rows
 }
 
-export function computeDiff(textA: string, textB: string, mode: WordMode): DiffResult {
+function segmentsToText(segments: DiffSegment[]): string {
+  return segments
+    .flatMap((s) => s.tokens)
+    .map((t) => (t.value === NEWLINE_MARKER ? "\n" : t.value))
+    .join("")
+}
+
+function neutralizeRow(row: DiffRowModel): DiffRowModel {
+  return {
+    ...row,
+    a: {
+      segments: row.a.segments.map((s) => ({ ...s, type: "equal" as const })),
+    },
+    b: {
+      segments: row.b.segments.map((s) => ({ ...s, type: "equal" as const })),
+    },
+  }
+}
+
+function applyIgnoreOptions(rows: DiffRowModel[], options: IgnoreOptions): DiffRowModel[] {
+  return rows.map((row) => {
+    const hasDiff =
+      row.a.segments.some((s) => s.type !== "equal") ||
+      row.b.segments.some((s) => s.type !== "equal")
+    if (!hasDiff) return row
+
+    if (options.ignoreTrimWhitespace) {
+      const textA = segmentsToText(row.a.segments).trim()
+      const textB = segmentsToText(row.b.segments).trim()
+      if (textA === textB) return neutralizeRow(row)
+    }
+
+    return row
+  })
+}
+
+export function computeDiff(
+  textA: string,
+  textB: string,
+  mode: WordMode,
+  ignoreOptions?: IgnoreOptions
+): DiffResult {
   const statsA = countStats(textA)
   const statsB = countStats(textB)
 
@@ -253,7 +295,11 @@ export function computeDiff(textA: string, textB: string, mode: WordMode): DiffR
   const tokensA = splitText(textA, mode)
   const tokensB = splitText(textB, mode)
   const chunks = computeChunks(tokensA, tokensB)
-  const rows = buildRows(chunks)
+  let rows = buildRows(chunks)
+
+  if (ignoreOptions) {
+    rows = applyIgnoreOptions(rows, ignoreOptions)
+  }
 
   return { rows, statsA, statsB, truncated: false }
 }

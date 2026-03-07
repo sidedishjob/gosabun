@@ -6,7 +6,7 @@ import { OptionsBar } from "@/components/OptionsBar"
 import { DiffViewer } from "@/components/DiffViewer"
 import { StatsRow } from "@/components/StatsRow"
 import { computeDiff } from "@/lib/diff-engine"
-import type { WordMode, Theme, DiffDisplayMode, DiffResult } from "@/lib/types"
+import type { WordMode, Theme, DiffDisplayMode, DiffResult, IgnoreOptions } from "@/lib/types"
 
 const SAMPLE_A = `探偵の田中は、深夜12時に依頼人から電話を受けた。
 「ダイヤモンドが消えた」と声は震えていた。
@@ -24,7 +24,7 @@ const SAMPLE_B = `探偵の鈴木は、深夜12時に依頼人から電話を受
 現場はNewJerseyの高級ホテル、MacArthur Suiteの305号室。
 The Suspect left no Fingerprints at the scene.
 部屋には不審な足跡と、半分飲まれたワインが残されていた。
-金庫は無傷のまま、窓だけが開け放たれていた。
+  金庫は無傷のまま、窓だけが開け放たれていた。
 The quick brown cat jumps over the lazy　dog.
 鈴木は静かにメモを取りながら、容疑者 を絞り込んでいった。
 
@@ -37,6 +37,9 @@ export default function Home() {
   const [wordMode, setWordMode] = useState<WordMode>("compat")
   const [theme, setTheme] = useState<Theme>("color1")
   const [displayMode, setDisplayMode] = useState<DiffDisplayMode>("all")
+  const [ignoreOptions, setIgnoreOptions] = useState<IgnoreOptions>({
+    ignoreTrimWhitespace: false,
+  })
   const [result, setResult] = useState<DiffResult | null>(null)
 
   useEffect(() => {
@@ -48,9 +51,9 @@ export default function Home() {
 
   const handleCompare = useCallback(() => {
     if (!canCompare) return
-    const r = computeDiff(textA, textB, wordMode)
+    const r = computeDiff(textA, textB, wordMode, ignoreOptions)
     setResult(r)
-  }, [textA, textB, wordMode, canCompare])
+  }, [textA, textB, wordMode, ignoreOptions, canCompare])
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -93,9 +96,11 @@ export default function Home() {
           wordMode={wordMode}
           theme={theme}
           displayMode={displayMode}
+          ignoreOptions={ignoreOptions}
           onWordModeChange={setWordMode}
           onThemeChange={setTheme}
           onDisplayModeChange={setDisplayMode}
+          onIgnoreOptionsChange={setIgnoreOptions}
         />
 
         {result && (
