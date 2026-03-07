@@ -43,3 +43,6 @@ next-env.d.ts
 
 # AI agent task files (temporary)
 docs/tasks/
+
+# claude
+.claude
