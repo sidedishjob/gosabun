@@ -6,7 +6,7 @@ import { OptionsBar } from "@/components/OptionsBar"
 import { DiffViewer } from "@/components/DiffViewer"
 import { StatsRow } from "@/components/StatsRow"
 import { computeDiff } from "@/lib/diff-engine"
-import type { WordMode, Theme, DiffResult } from "@/lib/types"
+import type { WordMode, Theme, DiffDisplayMode, DiffResult } from "@/lib/types"
 
 const SAMPLE_A = `探偵の田中は、深夜12時に依頼人から電話を受けた。
 「ダイヤモンドが消えた」と声は震えていた。
@@ -36,6 +36,7 @@ export default function Home() {
   const [textB, setTextB] = useState(SAMPLE_B)
   const [wordMode, setWordMode] = useState<WordMode>("compat")
   const [theme, setTheme] = useState<Theme>("color1")
+  const [displayMode, setDisplayMode] = useState<DiffDisplayMode>("all")
   const [result, setResult] = useState<DiffResult | null>(null)
 
   useEffect(() => {
@@ -91,13 +92,15 @@ export default function Home() {
         <OptionsBar
           wordMode={wordMode}
           theme={theme}
+          displayMode={displayMode}
           onWordModeChange={setWordMode}
           onThemeChange={setTheme}
+          onDisplayModeChange={setDisplayMode}
         />
 
         {result && (
           <>
-            <DiffViewer result={result} />
+            <DiffViewer result={result} displayMode={displayMode} />
             <div className="grid grid-cols-2 gap-4">
               <StatsRow label="テキスト A" stats={result.statsA} />
               <StatsRow label="テキスト B" stats={result.statsB} />

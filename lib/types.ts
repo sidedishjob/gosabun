@@ -46,3 +46,5 @@ export interface DiffResult {
 export type WordMode = "compat" | "extended" | "char"
 
 export type Theme = "color1" | "color2" | "mono"
+
+export type DiffDisplayMode = "all" | "diff-only"

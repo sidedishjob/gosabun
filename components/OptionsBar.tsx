@@ -1,16 +1,25 @@
 "use client"
 
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import type { WordMode, Theme } from "@/lib/types"
+import type { WordMode, Theme, DiffDisplayMode } from "@/lib/types"
 
 interface OptionsBarProps {
   wordMode: WordMode
   theme: Theme
+  displayMode: DiffDisplayMode
   onWordModeChange: (mode: WordMode) => void
   onThemeChange: (theme: Theme) => void
+  onDisplayModeChange: (mode: DiffDisplayMode) => void
 }
 
-export function OptionsBar({ wordMode, theme, onWordModeChange, onThemeChange }: OptionsBarProps) {
+export function OptionsBar({
+  wordMode,
+  theme,
+  displayMode,
+  onWordModeChange,
+  onThemeChange,
+  onDisplayModeChange,
+}: OptionsBarProps) {
   return (
     <div className="flex flex-wrap gap-6 items-center text-sm">
       <div className="flex items-center gap-3">
@@ -53,6 +62,23 @@ export function OptionsBar({ wordMode, theme, onWordModeChange, onThemeChange }:
           <label className="flex items-center gap-1.5 cursor-pointer">
             <RadioGroupItem value="mono" />
             モノ
+          </label>
+        </RadioGroup>
+      </div>
+      <div className="flex items-center gap-3">
+        <span className="font-medium">表示:</span>
+        <RadioGroup
+          value={displayMode}
+          onValueChange={(v) => onDisplayModeChange(v as DiffDisplayMode)}
+          className="flex gap-3"
+        >
+          <label className="flex items-center gap-1.5 cursor-pointer">
+            <RadioGroupItem value="all" />
+            全体
+          </label>
+          <label className="flex items-center gap-1.5 cursor-pointer">
+            <RadioGroupItem value="diff-only" />
+            差分のみ
           </label>
         </RadioGroup>
       </div>

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo, useCallback, useRef } from "react"
-import type { DiffResult, DiffRowModel } from "@/lib/types"
+import type { DiffResult, DiffRowModel, DiffDisplayMode } from "@/lib/types"
 import { DiffRow } from "./DiffRow"
 
 function hasChange(row: DiffRowModel): boolean {
@@ -13,29 +13,43 @@ function hasChange(row: DiffRowModel): boolean {
 
 interface DiffViewerProps {
   result: DiffResult
+  displayMode: DiffDisplayMode
 }
 
-export function DiffViewer({ result }: DiffViewerProps) {
+export function DiffViewer({ result, displayMode }: DiffViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [currentChangeIdx, setCurrentChangeIdx] = useState(-1)
 
+  const displayRows = useMemo(
+    () =>
+      displayMode === "diff-only"
+        ? result.rows
+            .map((row, i) => ({ row, originalIndex: i }))
+            .filter(({ row }) => hasChange(row))
+        : result.rows.map((row, i) => ({ row, originalIndex: i })),
+    [result.rows, displayMode]
+  )
+
   const changeIndices = useMemo(
-    () => result.rows.reduce<number[]>((acc, row, i) => (hasChange(row) ? [...acc, i] : acc), []),
-    [result.rows]
+    () =>
+      displayRows.reduce<number[]>((acc, { row }, i) => (hasChange(row) ? [...acc, i] : acc), []),
+    [displayRows]
   )
 
   const scrollToRow = useCallback(
     (changeIdx: number) => {
       if (!containerRef.current || changeIdx < 0 || changeIdx >= changeIndices.length) return
-      const rowIndex = changeIndices[changeIdx]
+      const displayIdx = changeIndices[changeIdx]
       const rows = containerRef.current.querySelectorAll<HTMLElement>("[data-diff-changed]")
-      const target = Array.from(rows).find((el) => el.dataset.diffChanged === String(rowIndex))
+      const target = Array.from(rows).find(
+        (el) => el.dataset.diffChanged === String(displayRows[displayIdx].originalIndex)
+      )
       if (target) {
         target.scrollIntoView({ behavior: "smooth", block: "center" })
         setCurrentChangeIdx(changeIdx)
       }
     },
-    [changeIndices]
+    [changeIndices, displayRows]
   )
 
   const handlePrev = useCallback(() => {
@@ -88,14 +102,14 @@ export function DiffViewer({ result }: DiffViewerProps) {
         </div>
       )}
       <div ref={containerRef} className="diff-viewer overflow-x-auto rounded border">
-        {result.rows.map((row, i) => (
+        {displayRows.map(({ row, originalIndex }, i) => (
           <DiffRow
-            key={i}
+            key={originalIndex}
             a={row.a}
             b={row.b}
             lineA={row.lineA}
             lineB={row.lineB}
-            rowIndex={i}
+            rowIndex={originalIndex}
             changed={changeIndices.includes(i)}
             highlighted={currentChangeIdx >= 0 && changeIndices[currentChangeIdx] === i}
           />
