@@ -93,6 +93,8 @@ export function DiffViewer({ result }: DiffViewerProps) {
             key={i}
             a={row.a}
             b={row.b}
+            lineA={row.lineA}
+            lineB={row.lineB}
             rowIndex={i}
             changed={changeIndices.includes(i)}
             highlighted={currentChangeIdx >= 0 && changeIndices[currentChangeIdx] === i}

@@ -25,6 +25,8 @@ export interface DiffCellModel {
 export interface DiffRowModel {
   a: DiffCellModel
   b: DiffCellModel
+  lineA?: number
+  lineB?: number
 }
 
 export interface DiffStats {

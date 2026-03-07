@@ -25,9 +25,10 @@ const SAMPLE_B = `探偵の鈴木は、深夜12時に依頼人から電話を受
 The Suspect left no Fingerprints at the scene.
 部屋には不審な足跡と、半分飲まれたワインが残されていた。
 金庫は無傷のまま、窓だけが開け放たれていた。
-The quick brown cat jumps over the lazy dog.
-鈴木は静かにメモを取りながら、容疑者を絞り込んでいった。
-容疑者リスト: 5名
+The quick brown cat jumps over the lazy　dog.
+鈴木は静かにメモを取りながら、容疑者 を絞り込んでいった。
+
+容疑者リスト： 5名
 この行は改訂版にのみ存在する。`
 
 export default function Home() {

@@ -3,7 +3,6 @@ import type {
   DiffToken,
   DiffChunk,
   DiffSegment,
-  DiffCellModel,
   DiffRowModel,
   DiffStats,
   DiffResult,
@@ -144,18 +143,31 @@ function splitByNewline(tokens: DiffToken[]): DiffToken[][] {
 }
 
 function buildRows(chunks: DiffChunk[]): DiffRowModel[] {
-  // Build rows by accumulating segments into current A/B cells
-  // When we encounter a newline, we flush the current row and start a new one
   let currentA: DiffSegment[] = []
   let currentB: DiffSegment[] = []
-  const rowsA: DiffCellModel[] = []
-  const rowsB: DiffCellModel[] = []
+  let lineA = 0
+  let lineB = 0
+  // Track which side "owns" the newline that triggers the next flush.
+  // Set BEFORE flushRow() so the flushed row gets the correct line numbers.
+  let newlineA = false
+  let newlineB = false
+  const rows: DiffRowModel[] = []
 
-  function flushBoth() {
-    rowsA.push({ segments: currentA })
-    rowsB.push({ segments: currentB })
+  function flushRow() {
+    const hasA = currentA.length > 0 || newlineA
+    const hasB = currentB.length > 0 || newlineB
+    if (hasA) lineA++
+    if (hasB) lineB++
+    rows.push({
+      a: { segments: currentA },
+      b: { segments: currentB },
+      lineA: hasA ? lineA : undefined,
+      lineB: hasB ? lineB : undefined,
+    })
     currentA = []
     currentB = []
+    newlineA = false
+    newlineB = false
   }
 
   for (const chunk of chunks) {
@@ -163,7 +175,11 @@ function buildRows(chunks: DiffChunk[]): DiffRowModel[] {
       case "equal": {
         const lines = splitByNewline(chunk.tokensA)
         for (let i = 0; i < lines.length; i++) {
-          if (i > 0) flushBoth()
+          if (i > 0) {
+            newlineA = true
+            newlineB = true
+            flushRow()
+          }
           if (lines[i].length > 0) {
             const seg: DiffSegment = { tokens: lines[i], type: "equal" }
             currentA.push(seg)
@@ -176,8 +192,8 @@ function buildRows(chunks: DiffChunk[]): DiffRowModel[] {
         const lines = splitByNewline(chunk.tokensA)
         for (let i = 0; i < lines.length; i++) {
           if (i > 0) {
-            rowsA.push({ segments: currentA })
-            currentA = []
+            newlineA = true
+            flushRow()
           }
           if (lines[i].length > 0) {
             currentA.push({ tokens: lines[i], type: "delete" })
@@ -189,8 +205,8 @@ function buildRows(chunks: DiffChunk[]): DiffRowModel[] {
         const lines = splitByNewline(chunk.tokensB)
         for (let i = 0; i < lines.length; i++) {
           if (i > 0) {
-            rowsB.push({ segments: currentB })
-            currentB = []
+            newlineB = true
+            flushRow()
           }
           if (lines[i].length > 0) {
             currentB.push({ tokens: lines[i], type: "insert" })
@@ -201,21 +217,17 @@ function buildRows(chunks: DiffChunk[]): DiffRowModel[] {
       case "replace": {
         const linesA = splitByNewline(chunk.tokensA)
         const linesB = splitByNewline(chunk.tokensB)
-        for (let i = 0; i < linesA.length; i++) {
+        const maxLines = Math.max(linesA.length, linesB.length)
+        for (let i = 0; i < maxLines; i++) {
           if (i > 0) {
-            rowsA.push({ segments: currentA })
-            currentA = []
+            if (i < linesA.length) newlineA = true
+            if (i < linesB.length) newlineB = true
+            flushRow()
           }
-          if (linesA[i].length > 0) {
+          if (i < linesA.length && linesA[i].length > 0) {
             currentA.push({ tokens: linesA[i], type: "delete" })
           }
-        }
-        for (let i = 0; i < linesB.length; i++) {
-          if (i > 0) {
-            rowsB.push({ segments: currentB })
-            currentB = []
-          }
-          if (linesB[i].length > 0) {
+          if (i < linesB.length && linesB[i].length > 0) {
             currentB.push({ tokens: linesB[i], type: "insert" })
           }
         }
@@ -225,15 +237,9 @@ function buildRows(chunks: DiffChunk[]): DiffRowModel[] {
   }
 
   // Flush remaining
-  rowsA.push({ segments: currentA })
-  rowsB.push({ segments: currentB })
+  flushRow()
 
-  // Pad to equal length
-  const maxLen = Math.max(rowsA.length, rowsB.length)
-  while (rowsA.length < maxLen) rowsA.push({ segments: [] })
-  while (rowsB.length < maxLen) rowsB.push({ segments: [] })
-
-  return rowsA.map((a, i) => ({ a, b: rowsB[i] }))
+  return rows
 }
 
 export function computeDiff(textA: string, textB: string, mode: WordMode): DiffResult {

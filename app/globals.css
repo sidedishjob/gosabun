@@ -189,6 +189,10 @@
   min-width: 0;
 }
 
+.diff-cell-empty {
+  background-color: var(--muted);
+}
+
 .diff-highlight {
   background-color: var(--diff-highlight-bg);
   color: var(--diff-highlight-text);

@@ -40,23 +40,28 @@ function renderCell(cell: DiffCellModel, side: "a" | "b") {
 interface DiffRowProps {
   a: DiffCellModel
   b: DiffCellModel
+  lineA?: number
+  lineB?: number
   rowIndex: number
   changed?: boolean
   highlighted?: boolean
 }
 
-export function DiffRow({ a, b, rowIndex, changed, highlighted }: DiffRowProps) {
+export function DiffRow({ a, b, lineA, lineB, rowIndex, changed, highlighted }: DiffRowProps) {
+  const paddingA = lineA === undefined
+  const paddingB = lineB === undefined
+
   return (
     <div
       className={`diff-row${highlighted ? " diff-row-highlighted" : ""}`}
       {...(changed ? { "data-diff-changed": rowIndex } : {})}
     >
-      <div className="diff-cell diff-cell-a">
-        <span className="diff-line-num">{rowIndex + 1}</span>
+      <div className={`diff-cell diff-cell-a${paddingA ? " diff-cell-empty" : ""}`}>
+        <span className="diff-line-num">{lineA ?? ""}</span>
         <span className="diff-cell-content">{renderCell(a, "a")}</span>
       </div>
-      <div className="diff-cell diff-cell-b">
-        <span className="diff-line-num">{rowIndex + 1}</span>
+      <div className={`diff-cell diff-cell-b${paddingB ? " diff-cell-empty" : ""}`}>
+        <span className="diff-line-num">{lineB ?? ""}</span>
         <span className="diff-cell-content">{renderCell(b, "b")}</span>
       </div>
     </div>
