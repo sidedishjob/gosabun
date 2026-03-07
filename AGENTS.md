@@ -130,3 +130,16 @@ AIエージェントが作業指示を受けた場合、以下の手順で進捗
 1. まず Markdown 本文を構成する
 2. 次に `docs/tasks/<task_key>/` を作成し、必ずファイルに書き出す
 3. チャットには要約のみを表示する
+
+### Todoタスク完了後ののタスクアーカイブ
+
+- ユーザーから「todo comp」の明示指示があった場合、完了タスクを `docs/_old/tasks/` へ移動する。
+- 実行手順:
+
+```bash
+cd /Users/iwa/Documents/01_develop/01_project/gosabun
+mkdir -p docs/_old/tasks
+mv docs/tasks/<task_key> .idea/_old/tasks/
+```
+
+- 同名フォルダが既に存在する場合は `<task_key>_YYYYMMDD` にリネームしてから移動する。
