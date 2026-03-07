@@ -134,4 +134,5 @@ AIエージェントが作業指示を受けた場合、以下の手順で進捗
 ### Todo タスクアーカイブ
 
 - Claude Code: `/todo-archive` スキルを使用する。
+  - ユーザーが「todo comp」と発言した場合も `/todo-archive` スキルを実行すること。
 - その他のエージェント: `docs/rules/todo-archive-rule.md` を参照して実行する。
