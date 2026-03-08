@@ -10,7 +10,6 @@
 2. アーカイブ先を作成し、フォルダを移動する
 
    ```bash
-   mkdir -p docs/_old/tasks
    mv docs/tasks/<task_key> docs/_old/tasks/
    ```
 

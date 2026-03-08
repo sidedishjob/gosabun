@@ -46,4 +46,5 @@ docs/tasks/
 docs/_old/
 
 # claude
+.agents
 .claude

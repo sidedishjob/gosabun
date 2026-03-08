@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { InputPanel } from "@/components/InputPanel"
 import { OptionsBar } from "@/components/OptionsBar"
 import { DiffViewer } from "@/components/DiffViewer"
@@ -50,13 +50,15 @@ export default function Home() {
   const [colorMode, setColorMode] = useState<ColorMode>("light")
   const [result, setResult] = useState<DiffResult | null>(null)
 
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", colorMode === "dark")
-  }, [colorMode])
+  const handleColorModeChange = useCallback((mode: ColorMode) => {
+    setColorMode(mode)
+    document.documentElement.classList.toggle("dark", mode === "dark")
+  }, [])
 
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme)
-  }, [theme])
+  const handleThemeChange = useCallback((t: Theme) => {
+    setTheme(t)
+    document.documentElement.setAttribute("data-theme", t)
+  }, [])
 
   const canCompare =
     textA.length > 0 && textB.length > 0 && textA.length <= 200_000 && textB.length <= 200_000
@@ -67,16 +69,21 @@ export default function Home() {
     setResult(r)
   }, [textA, textB, wordMode, ignoreOptions, canCompare])
 
+  const handleCompareRef = useRef(handleCompare)
+  useEffect(() => {
+    handleCompareRef.current = handleCompare
+  })
+
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
         e.preventDefault()
-        handleCompare()
+        handleCompareRef.current()
       }
     }
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [handleCompare])
+  }, [])
 
   function handleSwap() {
     setTextA(textB)
@@ -111,10 +118,10 @@ export default function Home() {
           ignoreOptions={ignoreOptions}
           colorMode={colorMode}
           onWordModeChange={setWordMode}
-          onThemeChange={setTheme}
+          onThemeChange={handleThemeChange}
           onDisplayModeChange={setDisplayMode}
           onIgnoreOptionsChange={setIgnoreOptions}
-          onColorModeChange={setColorMode}
+          onColorModeChange={handleColorModeChange}
         />
 
         {result && (
