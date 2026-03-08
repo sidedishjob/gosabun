@@ -42,7 +42,6 @@ next-env.d.ts
 .idea
 
 # AI agent task files (temporary)
-docs/tasks/
 docs/_old/
 
 # claude

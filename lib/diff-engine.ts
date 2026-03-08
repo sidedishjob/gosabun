@@ -10,8 +10,7 @@ import type {
   WordMode,
   IgnoreOptions,
 } from "./types"
-
-const MAX_CHARS = 200_000
+import { MAX_TEXT_LENGTH } from "./constants"
 const NEWLINE_MARKER = "<$>"
 
 export function splitText(text: string, mode: WordMode): DiffToken[] {
@@ -80,6 +79,9 @@ function tokenToKey(token: DiffToken): string {
 
 function keyToToken(key: string): DiffToken {
   const idx = key.indexOf("\u0000")
+  if (idx === -1) {
+    return { type: "char", value: key }
+  }
   return {
     type: key.slice(0, idx) as TokenType,
     value: key.slice(idx + 1),
@@ -155,6 +157,7 @@ function buildRows(chunks: DiffChunk[]): DiffRowModel[] {
   const rows: DiffRowModel[] = []
 
   function flushRow() {
+    if (currentA.length === 0 && currentB.length === 0 && !newlineA && !newlineB) return
     const hasA = currentA.length > 0 || newlineA
     const hasB = currentB.length > 0 || newlineB
     if (hasA) lineA++
@@ -288,7 +291,7 @@ export function computeDiff(
   const statsA = countStats(textA)
   const statsB = countStats(textB)
 
-  if (textA.length > MAX_CHARS || textB.length > MAX_CHARS) {
+  if (textA.length > MAX_TEXT_LENGTH || textB.length > MAX_TEXT_LENGTH) {
     return { rows: [], statsA, statsB, truncated: true }
   }
 

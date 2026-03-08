@@ -41,9 +41,8 @@ export function DiffViewer({ result, displayMode }: DiffViewerProps) {
     (changeIdx: number) => {
       if (!containerRef.current || changeIdx < 0 || changeIdx >= changeIndices.length) return
       const displayIdx = changeIndices[changeIdx]
-      const rows = containerRef.current.querySelectorAll<HTMLElement>("[data-diff-changed]")
-      const target = Array.from(rows).find(
-        (el) => el.dataset.diffChanged === String(displayRows[displayIdx].originalIndex)
+      const target = containerRef.current.querySelector<HTMLElement>(
+        `[data-diff-changed="${displayRows[displayIdx].originalIndex}"]`
       )
       if (target) {
         target.scrollIntoView({ behavior: "smooth", block: "center" })

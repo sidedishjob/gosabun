@@ -8,6 +8,7 @@ import { DiffViewer } from "@/components/DiffViewer"
 import { StatsRow } from "@/components/StatsRow"
 import { computeDiff } from "@/lib/diff-engine"
 import { useUndoStack } from "@/hooks/useUndoStack"
+import { MAX_TEXT_LENGTH } from "@/lib/constants"
 import type {
   WordMode,
   Theme,
@@ -65,7 +66,10 @@ export default function Home() {
   }, [])
 
   const canCompare =
-    textA.length > 0 && textB.length > 0 && textA.length <= 200_000 && textB.length <= 200_000
+    textA.length > 0 &&
+    textB.length > 0 &&
+    textA.length <= MAX_TEXT_LENGTH &&
+    textB.length <= MAX_TEXT_LENGTH
 
   const handleCompare = useCallback(() => {
     if (!canCompare) return

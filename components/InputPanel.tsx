@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 import { ArrowLeftRight, X } from "lucide-react"
-
-const MAX_CHARS = 200_000
+import { MAX_TEXT_LENGTH } from "@/lib/constants"
 
 interface InputPanelProps {
   textA: string
@@ -30,8 +29,8 @@ export function InputPanel({
   onCompare,
   onClear,
 }: InputPanelProps) {
-  const overLimitA = textA.length > MAX_CHARS
-  const overLimitB = textB.length > MAX_CHARS
+  const overLimitA = textA.length > MAX_TEXT_LENGTH
+  const overLimitB = textB.length > MAX_TEXT_LENGTH
   const canCompare = textA.length > 0 && textB.length > 0 && !overLimitA && !overLimitB
 
   return (
