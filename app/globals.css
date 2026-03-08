@@ -91,15 +91,15 @@
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.922 0 0);
   --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
+  --secondary: oklch(0.3 0 0);
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
+  --muted: oklch(0.3 0 0);
+  --muted-foreground: oklch(0.75 0 0);
+  --accent: oklch(0.3 0 0);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
+  --border: oklch(1 0 0 / 18%);
+  --input: oklch(1 0 0 / 22%);
   --ring: oklch(0.556 0 0);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
@@ -110,9 +110,9 @@
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent: oklch(0.3 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-border: oklch(1 0 0 / 18%);
   --sidebar-ring: oklch(0.556 0 0);
 }
 
@@ -126,8 +126,8 @@
 .dark [data-theme="color1"],
 .dark:not([data-theme]),
 .dark[data-theme="color1"] {
-  --diff-highlight-bg: #1a3a5c;
-  --diff-highlight-text: #93c5fd;
+  --diff-highlight-bg: #1e3f63;
+  --diff-highlight-text: #a5d0fe;
 }
 
 /* Diff theme: color2 (green) */
@@ -138,8 +138,8 @@
 
 .dark [data-theme="color2"],
 .dark[data-theme="color2"] {
-  --diff-highlight-bg: #14402a;
-  --diff-highlight-text: #86efac;
+  --diff-highlight-bg: #184a30;
+  --diff-highlight-text: #a0f0be;
 }
 
 /* Diff theme: mono (grey) */
@@ -150,8 +150,8 @@
 
 .dark [data-theme="mono"],
 .dark[data-theme="mono"] {
-  --diff-highlight-bg: #374151;
-  --diff-highlight-text: #d1d5db;
+  --diff-highlight-bg: #3f4a5c;
+  --diff-highlight-text: #dde1e7;
 }
 
 @layer base {
@@ -239,6 +239,10 @@
 
 .dark .diff-cell-empty {
   background-color: var(--muted);
+}
+
+.dark .diff-line-num {
+  color: oklch(0.6 0 0);
 }
 
 .dark .diff-row-highlighted {

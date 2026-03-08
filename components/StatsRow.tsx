@@ -12,16 +12,17 @@ export function StatsRow({ label, stats }: StatsRowProps) {
   const newlineCount = stats.charWithNewline - stats.charWithSpace
 
   return (
-    <div className="rounded border p-3 text-sm font-mono bg-muted/50">
-      <div className="font-bold mb-1">{label}</div>
-      <div>文字数: {stats.charCount}</div>
-      <div>
-        空白数: {spaceCount}　空白込み文字数: {stats.charWithSpace}
-      </div>
-      <div>
-        改行数: {newlineCount}　改行込み文字数: {stats.charWithNewline}
-      </div>
-      <div>単語数: {stats.wordCount}</div>
+    <div className="rounded-md border p-2.5 text-xs font-mono bg-muted/30">
+      <span className="font-semibold">{label}</span>
+      <span className="mx-2 text-muted-foreground/40">|</span>
+      <span className="text-muted-foreground">
+        {stats.charCount}字<span className="mx-1.5 text-muted-foreground/40">/</span>
+        空白{spaceCount}
+        <span className="mx-1.5 text-muted-foreground/40">/</span>
+        改行{newlineCount}
+        <span className="mx-1.5 text-muted-foreground/40">/</span>
+        {stats.wordCount}語
+      </span>
     </div>
   )
 }

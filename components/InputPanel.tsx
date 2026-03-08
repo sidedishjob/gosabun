@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 import { ArrowLeftRight, X } from "lucide-react"
 
 const MAX_CHARS = 200_000
@@ -34,10 +35,10 @@ export function InputPanel({
       <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-2 items-start">
         <div className="space-y-1">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium">テキスト A</label>
+            <label className="text-xs font-medium text-muted-foreground">テキスト A</label>
             {textA.length > 0 && (
-              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => onChangeA("")}>
-                <X className="h-4 w-4" />
+              <Button variant="ghost" size="icon-xs" onClick={() => onChangeA("")}>
+                <X className="h-3.5 w-3.5" />
               </Button>
             )}
           </div>
@@ -45,7 +46,7 @@ export function InputPanel({
             value={textA}
             onChange={(e) => onChangeA(e.target.value)}
             placeholder="比較するテキストを入力..."
-            className="field-sizing-fixed! h-48 md:h-80 resize-none overflow-y-auto font-mono text-sm"
+            className="field-sizing-fixed! h-48 md:h-72 resize-none overflow-y-auto font-mono text-sm"
           />
           {overLimitA && (
             <p className="text-xs text-destructive">
@@ -54,18 +55,18 @@ export function InputPanel({
           )}
         </div>
 
-        <div className="flex justify-center items-center md:pt-7">
-          <Button variant="outline" size="icon" className="h-8 w-8" onClick={onSwap}>
+        <div className="flex justify-center items-center md:pt-6">
+          <Button variant="ghost" size="icon-sm" onClick={onSwap} className="text-muted-foreground">
             <ArrowLeftRight className="h-4 w-4" />
           </Button>
         </div>
 
         <div className="space-y-1">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium">テキスト B</label>
+            <label className="text-xs font-medium text-muted-foreground">テキスト B</label>
             {textB.length > 0 && (
-              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => onChangeB("")}>
-                <X className="h-4 w-4" />
+              <Button variant="ghost" size="icon-xs" onClick={() => onChangeB("")}>
+                <X className="h-3.5 w-3.5" />
               </Button>
             )}
           </div>
@@ -73,7 +74,7 @@ export function InputPanel({
             value={textB}
             onChange={(e) => onChangeB(e.target.value)}
             placeholder="比較するテキストを入力..."
-            className="field-sizing-fixed! h-48 md:h-80 resize-none overflow-y-auto font-mono text-sm"
+            className="field-sizing-fixed! h-48 md:h-72 resize-none overflow-y-auto font-mono text-sm"
           />
           {overLimitB && (
             <p className="text-xs text-destructive">
@@ -84,24 +85,25 @@ export function InputPanel({
       </div>
 
       <div className="flex justify-center gap-2">
-        <Button onClick={onCompare} disabled={!canCompare} className="px-8">
-          比較
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button onClick={onCompare} disabled={!canCompare} className="px-8">
+              比較する
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            <kbd className="font-mono text-[10px]">⌘+Enter</kbd>
+          </TooltipContent>
+        </Tooltip>
         <Button
-          variant="outline"
+          variant="ghost"
           onClick={onClear}
           disabled={textA.length === 0 && textB.length === 0}
-          className="px-8"
+          className="text-muted-foreground"
         >
           クリア
         </Button>
       </div>
-      <p className="text-center text-xs text-muted-foreground">
-        <kbd className="rounded border px-1 py-0.5 text-[10px]">⌘</kbd>
-        <span className="mx-0.5">+</span>
-        <kbd className="rounded border px-1 py-0.5 text-[10px]">Enter</kbd>
-        <span className="ml-1">で比較</span>
-      </p>
     </div>
   )
 }

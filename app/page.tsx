@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
+import { Moon, Sun } from "lucide-react"
 import { InputPanel } from "@/components/InputPanel"
 import { OptionsBar } from "@/components/OptionsBar"
 import { DiffViewer } from "@/components/DiffViewer"
@@ -97,42 +98,55 @@ export default function Home() {
   }
 
   return (
-    <div className="bg-background">
-      <div className="mx-auto max-w-6xl px-4 py-6 space-y-6">
-        <h1 className="text-2xl font-bold">gosabun - テキスト差分比較</h1>
+    <div className="bg-background min-h-screen">
+      <div className="mx-auto max-w-6xl px-4 py-4 md:py-6">
+        <header className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-xl font-bold tracking-tight">gosabun</h1>
+            <p className="text-xs text-muted-foreground">テキスト差分比較</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => handleColorModeChange(colorMode === "light" ? "dark" : "light")}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md border hover:bg-muted transition-colors cursor-pointer"
+            aria-label={colorMode === "light" ? "ダークモードに切替" : "ライトモードに切替"}
+          >
+            {colorMode === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+          </button>
+        </header>
 
-        <InputPanel
-          textA={textA}
-          textB={textB}
-          onChangeA={setTextA}
-          onChangeB={setTextB}
-          onSwap={handleSwap}
-          onCompare={handleCompare}
-          onClear={handleClear}
-        />
+        <div className="space-y-4">
+          <InputPanel
+            textA={textA}
+            textB={textB}
+            onChangeA={setTextA}
+            onChangeB={setTextB}
+            onSwap={handleSwap}
+            onCompare={handleCompare}
+            onClear={handleClear}
+          />
 
-        <OptionsBar
-          wordMode={wordMode}
-          theme={theme}
-          displayMode={displayMode}
-          ignoreOptions={ignoreOptions}
-          colorMode={colorMode}
-          onWordModeChange={setWordMode}
-          onThemeChange={handleThemeChange}
-          onDisplayModeChange={setDisplayMode}
-          onIgnoreOptionsChange={setIgnoreOptions}
-          onColorModeChange={handleColorModeChange}
-        />
+          <OptionsBar
+            wordMode={wordMode}
+            theme={theme}
+            displayMode={displayMode}
+            ignoreOptions={ignoreOptions}
+            onWordModeChange={setWordMode}
+            onThemeChange={handleThemeChange}
+            onDisplayModeChange={setDisplayMode}
+            onIgnoreOptionsChange={setIgnoreOptions}
+          />
 
-        {result && (
-          <>
-            <DiffViewer result={result} displayMode={displayMode} />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <StatsRow label="テキスト A" stats={result.statsA} />
-              <StatsRow label="テキスト B" stats={result.statsB} />
-            </div>
-          </>
-        )}
+          {result && (
+            <>
+              <DiffViewer result={result} displayMode={displayMode} />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <StatsRow label="テキスト A" stats={result.statsA} />
+                <StatsRow label="テキスト B" stats={result.statsB} />
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   )

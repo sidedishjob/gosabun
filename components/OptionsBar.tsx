@@ -1,9 +1,8 @@
 "use client"
 
-import { CircleHelp, Sun, Moon } from "lucide-react"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { CircleHelp } from "lucide-react"
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
-import type { WordMode, Theme, DiffDisplayMode, IgnoreOptions, ColorMode } from "@/lib/types"
+import type { WordMode, Theme, DiffDisplayMode, IgnoreOptions } from "@/lib/types"
 
 const WORD_MODE_HELP: Record<WordMode, string> = {
   compat: "小文字英単語を1トークンとして比較（difff互換）",
@@ -11,17 +10,62 @@ const WORD_MODE_HELP: Record<WordMode, string> = {
   char: "1文字ずつ比較",
 }
 
+interface SegmentOption<T extends string> {
+  value: T
+  label: string
+  tooltip?: string
+}
+
+function SegmentedControl<T extends string>({
+  options,
+  value,
+  onChange,
+}: {
+  options: SegmentOption<T>[]
+  value: T
+  onChange: (value: T) => void
+}) {
+  return (
+    <div className="inline-flex rounded-md border bg-muted/60 p-0.5 dark:bg-muted/40">
+      {options.map((opt) => {
+        const isActive = value === opt.value
+        const button = (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => onChange(opt.value)}
+            className={`inline-flex items-center gap-1 rounded-sm px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer ${
+              isActive
+                ? "bg-background text-foreground shadow-sm dark:bg-accent dark:text-accent-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {opt.label}
+            {opt.tooltip && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <CircleHelp className="h-3 w-3 text-muted-foreground" />
+                </TooltipTrigger>
+                <TooltipContent side="top">{opt.tooltip}</TooltipContent>
+              </Tooltip>
+            )}
+          </button>
+        )
+        return button
+      })}
+    </div>
+  )
+}
+
 interface OptionsBarProps {
   wordMode: WordMode
   theme: Theme
   displayMode: DiffDisplayMode
   ignoreOptions: IgnoreOptions
-  colorMode: ColorMode
   onWordModeChange: (mode: WordMode) => void
   onThemeChange: (theme: Theme) => void
   onDisplayModeChange: (mode: DiffDisplayMode) => void
   onIgnoreOptionsChange: (options: IgnoreOptions) => void
-  onColorModeChange: (mode: ColorMode) => void
 }
 
 export function OptionsBar({
@@ -29,99 +73,63 @@ export function OptionsBar({
   theme,
   displayMode,
   ignoreOptions,
-  colorMode,
   onWordModeChange,
   onThemeChange,
   onDisplayModeChange,
   onIgnoreOptionsChange,
-  onColorModeChange,
 }: OptionsBarProps) {
+  const wordModeOptions: SegmentOption<WordMode>[] = [
+    { value: "compat", label: "互換", tooltip: WORD_MODE_HELP.compat },
+    { value: "extended", label: "拡張", tooltip: WORD_MODE_HELP.extended },
+    { value: "char", label: "文字", tooltip: WORD_MODE_HELP.char },
+  ]
+
+  const themeOptions: SegmentOption<Theme>[] = [
+    { value: "color1", label: "青" },
+    { value: "color2", label: "緑" },
+    { value: "mono", label: "モノ" },
+  ]
+
+  const displayOptions: SegmentOption<DiffDisplayMode>[] = [
+    { value: "all", label: "全体" },
+    { value: "diff-only", label: "差分のみ" },
+  ]
+
   return (
-    <div className="flex flex-wrap gap-6 items-center text-sm">
-      <div className="flex items-center gap-3">
-        <span className="font-medium">比較モード:</span>
-        <RadioGroup
-          value={wordMode}
-          onValueChange={(v) => onWordModeChange(v as WordMode)}
-          className="flex gap-3"
-        >
-          {(["compat", "extended", "char"] as const).map((mode) => (
-            <label key={mode} className="flex items-center gap-1.5 cursor-pointer">
-              <RadioGroupItem value={mode} />
-              {{ compat: "互換", extended: "拡張", char: "文字" }[mode]}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <CircleHelp className="h-3.5 w-3.5 text-muted-foreground" />
-                </TooltipTrigger>
-                <TooltipContent side="top">{WORD_MODE_HELP[mode]}</TooltipContent>
-              </Tooltip>
-            </label>
-          ))}
-        </RadioGroup>
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+      <div className="flex items-center gap-1.5">
+        <span className="text-xs text-muted-foreground">比較</span>
+        <SegmentedControl options={wordModeOptions} value={wordMode} onChange={onWordModeChange} />
       </div>
 
-      <div className="flex items-center gap-3">
-        <span className="font-medium">テーマ:</span>
-        <RadioGroup
-          value={theme}
-          onValueChange={(v) => onThemeChange(v as Theme)}
-          className="flex gap-3"
-        >
-          <label className="flex items-center gap-1.5 cursor-pointer">
-            <RadioGroupItem value="color1" />
-            色1
-          </label>
-          <label className="flex items-center gap-1.5 cursor-pointer">
-            <RadioGroupItem value="color2" />
-            色2
-          </label>
-          <label className="flex items-center gap-1.5 cursor-pointer">
-            <RadioGroupItem value="mono" />
-            モノ
-          </label>
-        </RadioGroup>
+      <div className="flex items-center gap-1.5">
+        <span className="text-xs text-muted-foreground">配色</span>
+        <SegmentedControl options={themeOptions} value={theme} onChange={onThemeChange} />
       </div>
-      <div className="flex items-center gap-3">
-        <span className="font-medium">表示:</span>
-        <RadioGroup
+
+      <div className="flex items-center gap-1.5">
+        <span className="text-xs text-muted-foreground">表示</span>
+        <SegmentedControl
+          options={displayOptions}
           value={displayMode}
-          onValueChange={(v) => onDisplayModeChange(v as DiffDisplayMode)}
-          className="flex gap-3"
-        >
-          <label className="flex items-center gap-1.5 cursor-pointer">
-            <RadioGroupItem value="all" />
-            全体
-          </label>
-          <label className="flex items-center gap-1.5 cursor-pointer">
-            <RadioGroupItem value="diff-only" />
-            差分のみ
-          </label>
-        </RadioGroup>
+          onChange={onDisplayModeChange}
+        />
       </div>
-      <div className="flex items-center gap-3">
-        <span className="font-medium">無視:</span>
-        <label className="flex items-center gap-1.5 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={ignoreOptions.ignoreTrimWhitespace}
-            onChange={(e) =>
-              onIgnoreOptionsChange({
-                ...ignoreOptions,
-                ignoreTrimWhitespace: e.target.checked,
-              })
-            }
-          />
-          行頭・行末の空白
-        </label>
-      </div>
-      <button
-        type="button"
-        onClick={() => onColorModeChange(colorMode === "light" ? "dark" : "light")}
-        className="ml-auto inline-flex h-8 w-8 items-center justify-center rounded-md border hover:bg-muted transition-colors cursor-pointer"
-        aria-label={colorMode === "light" ? "ダークモードに切替" : "ライトモードに切替"}
-      >
-        {colorMode === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-      </button>
+
+      <label className="flex items-center gap-1.5 text-xs cursor-pointer select-none">
+        <input
+          type="checkbox"
+          checked={ignoreOptions.ignoreTrimWhitespace}
+          onChange={(e) =>
+            onIgnoreOptionsChange({
+              ...ignoreOptions,
+              ignoreTrimWhitespace: e.target.checked,
+            })
+          }
+          className="rounded"
+        />
+        <span className="text-muted-foreground">前後の空白を無視</span>
+      </label>
     </div>
   )
 }
