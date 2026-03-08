@@ -50,6 +50,7 @@ export default function Home() {
   })
   const [colorMode, setColorMode] = useState<ColorMode>("light")
   const [result, setResult] = useState<DiffResult | null>(null)
+  const [resultVersion, setResultVersion] = useState(0)
 
   const handleColorModeChange = useCallback((mode: ColorMode) => {
     setColorMode(mode)
@@ -68,6 +69,7 @@ export default function Home() {
     if (!canCompare) return
     const r = computeDiff(textA, textB, wordMode, ignoreOptions)
     setResult(r)
+    setResultVersion((v) => v + 1)
   }, [textA, textB, wordMode, ignoreOptions, canCompare])
 
   const handleCompareRef = useRef(handleCompare)
@@ -139,7 +141,7 @@ export default function Home() {
 
           {result && (
             <>
-              <DiffViewer result={result} displayMode={displayMode} />
+              <DiffViewer key={resultVersion} result={result} displayMode={displayMode} />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <StatsRow label="テキスト A" stats={result.statsA} />
                 <StatsRow label="テキスト B" stats={result.statsB} />
