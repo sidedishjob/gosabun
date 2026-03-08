@@ -39,16 +39,14 @@ export function InputPanel({
         <div className="space-y-1">
           <div className="flex items-center justify-between">
             <label className="text-xs font-medium text-muted-foreground">テキスト A</label>
-            {textA.length > 0 && (
-              <Button
-                variant="ghost"
-                size="icon-xs"
-                onClick={onClearA}
-                className="relative before:absolute before:-inset-2 before:content-['']"
-              >
-                <X className="h-3.5 w-3.5" />
-              </Button>
-            )}
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              onClick={onClearA}
+              className={`relative before:absolute before:-inset-2 before:content-[''] ${textA.length === 0 ? "invisible" : ""}`}
+            >
+              <X className="h-3.5 w-3.5" />
+            </Button>
           </div>
           <Textarea
             value={textA}
@@ -72,16 +70,14 @@ export function InputPanel({
         <div className="space-y-1">
           <div className="flex items-center justify-between">
             <label className="text-xs font-medium text-muted-foreground">テキスト B</label>
-            {textB.length > 0 && (
-              <Button
-                variant="ghost"
-                size="icon-xs"
-                onClick={onClearB}
-                className="relative before:absolute before:-inset-2 before:content-['']"
-              >
-                <X className="h-3.5 w-3.5" />
-              </Button>
-            )}
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              onClick={onClearB}
+              className={`relative before:absolute before:-inset-2 before:content-[''] ${textB.length === 0 ? "invisible" : ""}`}
+            >
+              <X className="h-3.5 w-3.5" />
+            </Button>
           </div>
           <Textarea
             value={textB}
