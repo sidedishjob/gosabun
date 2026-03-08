@@ -19,6 +19,16 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.svg",
   },
+  openGraph: {
+    title: "gosabun - テキスト差分比較",
+    description: "サーバー送信なし。ブラウザ完結のテキスト差分比較ツール",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "gosabun - テキスト差分比較",
+    description: "サーバー送信なし。ブラウザ完結のテキスト差分比較ツール",
+  },
 }
 
 export default function RootLayout({

@@ -45,7 +45,11 @@ export function DiffViewer({ result, displayMode }: DiffViewerProps) {
         `[data-diff-changed="${displayRows[displayIdx].originalIndex}"]`
       )
       if (target) {
-        target.scrollIntoView({ behavior: "smooth", block: "center" })
+        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        target.scrollIntoView({
+          behavior: prefersReducedMotion ? "auto" : "smooth",
+          block: "center",
+        })
         setCurrentChangeIdx(changeIdx)
       }
     },
@@ -87,7 +91,7 @@ export function DiffViewer({ result, displayMode }: DiffViewerProps) {
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-        <span className="tabular-nums">
+        <span className="tabular-nums" aria-live="polite" aria-atomic="true">
           {currentChangeIdx >= 0 ? currentChangeIdx + 1 : "-"} / {changeIndices.length} 件
         </span>
         <button

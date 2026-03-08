@@ -40,7 +40,12 @@ export function InputPanel({
           <div className="flex items-center justify-between">
             <label className="text-xs font-medium text-muted-foreground">テキスト A</label>
             {textA.length > 0 && (
-              <Button variant="ghost" size="icon-xs" onClick={onClearA}>
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                onClick={onClearA}
+                className="relative before:absolute before:-inset-2 before:content-['']"
+              >
                 <X className="h-3.5 w-3.5" />
               </Button>
             )}
@@ -68,7 +73,12 @@ export function InputPanel({
           <div className="flex items-center justify-between">
             <label className="text-xs font-medium text-muted-foreground">テキスト B</label>
             {textB.length > 0 && (
-              <Button variant="ghost" size="icon-xs" onClick={onClearB}>
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                onClick={onClearB}
+                className="relative before:absolute before:-inset-2 before:content-['']"
+              >
                 <X className="h-3.5 w-3.5" />
               </Button>
             )}
