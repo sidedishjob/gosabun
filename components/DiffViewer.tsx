@@ -76,6 +76,14 @@ export function DiffViewer({ result, displayMode }: DiffViewerProps) {
     return null
   }
 
+  if (changeIndices.length === 0) {
+    return (
+      <div className="rounded border p-8 text-center text-sm text-muted-foreground">
+        差分はありません
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-2">
       {changeIndices.length > 0 && (
