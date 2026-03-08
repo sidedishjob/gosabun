@@ -5,7 +5,7 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip
 import type { WordMode, Theme, DiffDisplayMode, IgnoreOptions } from "@/lib/types"
 
 const WORD_MODE_HELP: Record<WordMode, string> = {
-  compat: "小文字英単語を1トークンとして比較（difff互換）",
+  compat: "小文字英単語を1トークンとして比較",
   extended: "大文字小文字区別なく英単語を1トークンとして比較",
   char: "1文字ずつ比較",
 }
