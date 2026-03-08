@@ -1,36 +1,160 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# gosabun
 
-## Getting Started
+## ブラウザだけで完結するテキスト差分比較ツール
 
-First, run the development server:
+[機能](#機能) · [使い方](#使い方) · [インストール](#インストール) · [カスタマイズ](#カスタマイズ)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+> **完全クライアント完結** — 入力テキストはサーバーに送信されません。すべての処理はブラウザ内で完了します。
+
+---
+
+## 課題
+
+2つのテキストの違いを確認したいだけなのに、ツールをインストールしたり、テキストを外部サーバーに送信したり、英語圏向けの diff ツールで日本語が正しく比較されなかったりする。
+
+gosabun はシンプルな UI をベースに、**クライアント完結**・**日本語対応**・**カスタマイズ可能**なテキスト差分比較ツールを提供します。
+
+---
+
+## 動作イメージ
+
+```text
+┌─────────────────┬─────────────────┐
+│ テキスト A       │ テキスト B       │
+│                  │                  │
+│ 探偵の[田中]は   │ 探偵の[鈴木]は   │
+│ [ダイヤモンド]が │ [エメラルド]が   │
+│ 消えた           │ 消えた           │
+└─────────────────┴─────────────────┘
+
+  変更箇所: 3 / 7  [▲ 前へ] [▼ 次へ]
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2つのテキストを貼り付けて `Cmd+Enter`（または比較ボタン）を押すだけ。変更箇所がハイライト表示され、前後ナビゲーションで差分を順に確認できます。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 機能
 
-## Learn More
+- **3つの比較モード** — 互換（difff準拠）・拡張（大文字小文字対応）・文字単位
+- **3つのカラーテーマ** — ブルー・グリーン・モノクロ
+- **表示フィルタ** — 全行表示 / 差分のみ表示
+- **空白無視オプション** — 行頭・行末の空白を無視して比較
+- **ダークモード** — ライト / ダーク切替対応
+- **変更箇所ナビゲーション** — 前へ / 次へボタンで差分箇所にジャンプ
+- **テキスト統計** — 文字数・空白込み文字数・改行込み文字数・単語数を表示
+- **キーボードショートカット** — `Cmd+Enter` / `Ctrl+Enter` で即座に比較実行
+- **レスポンシブ対応** — モバイルからデスクトップまで対応
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## インストール
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+git clone https://github.com/sidedishjob/gosabun.git
+cd gosabun
+npm install
+npm run dev
+```
 
-## Deploy on Vercel
+ブラウザで `http://localhost:3000` を開くと使えます。
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 使い方
+
+1. **テキスト A** と **テキスト B** にそれぞれテキストを入力（またはペースト）
+2. **比較** ボタンをクリック、または `Cmd+Enter` / `Ctrl+Enter`
+3. 差分がハイライト表示される
+4. **▲ / ▼** ボタンで変更箇所を順に確認
+
+テキストの入れ替え（⇄ボタン）やクリアも可能です。
+
+---
+
+## カスタマイズ
+
+### 比較モード
+
+| モード | 説明                                            |
+| ------ | ----------------------------------------------- |
+| 互換   | 小文字英単語を1トークンとして比較（difff 互換） |
+| 拡張   | 大文字・小文字の英単語を1トークンとして比較     |
+| 文字   | 1文字ずつ比較                                   |
+
+### カラーテーマ
+
+| テーマ | 差分の色                   |
+| ------ | -------------------------- |
+| 色1    | ブルー（difff デフォルト） |
+| 色2    | グリーン                   |
+| モノ   | グレー                     |
+
+### その他のオプション
+
+- **表示モード**: 全行表示 / 差分のみ表示
+- **空白無視**: 行頭・行末の空白を無視して比較
+- **ダークモード**: 画面右のトグルで切替
+
+---
+
+## 技術スタック
+
+| カテゴリ          | 技術                    |
+| ----------------- | ----------------------- |
+| フレームワーク    | Next.js 16 + React 19   |
+| 言語              | TypeScript              |
+| スタイリング      | Tailwind CSS 4          |
+| UI コンポーネント | Radix UI + shadcn/ui    |
+| Diff エンジン     | jsdiff (diff v8)        |
+| アイコン          | Lucide React            |
+| フォント          | Geist Sans / Geist Mono |
+
+すべての差分処理はクライアントサイドで実行されます。サーバーサイドの API は使用していません。
+
+---
+
+## 開発
+
+```bash
+npm run dev          # 開発サーバー起動
+npm run build        # プロダクションビルド
+npm run lint         # ESLint 実行
+npm run format       # Prettier フォーマット
+npm run format:check # フォーマットチェック
+```
+
+---
+
+## Cloudflare Pages への CI/CD
+
+本リポジトリには GitHub Actions の CI/CD ワークフローを同梱しています。
+
+- PR（`main` 向け）: `lint` / `format:check` / `build` 実行後、Cloudflare Pages に Preview デプロイ
+- `main` への push: 同じ CI を通過後、Cloudflare Pages 本番デプロイ
+
+### 事前準備（GitHub Repository Settings）
+
+`Settings > Secrets and variables > Actions` に以下を設定してください。
+
+- `Secrets`
+  - `CLOUDFLARE_API_TOKEN`
+  - `CLOUDFLARE_ACCOUNT_ID`
+- `Variables`
+  - `CLOUDFLARE_PAGES_PROJECT_NAME`
+
+Cloudflare API Token は Pages のデプロイ権限を持つトークンを利用してください。
+
+---
+
+## License
+
+Private
+
+---
+
+## Contributing
+
+Issue や PR を歓迎します。
