@@ -130,22 +130,19 @@ npm run format:check # フォーマットチェック
 
 ## Cloudflare Pages への CI/CD
 
-本リポジトリには GitHub Actions の CI/CD ワークフローを同梱しています。
+本リポジトリでは、CI は GitHub Actions、CD は Cloudflare Pages の Git 連携で運用します。
 
-- PR（`main` 向け）: `lint` / `format:check` / `build` 実行後、Cloudflare Pages に Preview デプロイ
-- `main` への push: 同じ CI を通過後、Cloudflare Pages 本番デプロイ
+- CI（`.github/workflows/ci.yml`）
+  - `develop` / `main` 向け PR で `lint` / `format:check` / `build` を実行
+  - `develop` への push でも同じ検証を実行
+- CD（Cloudflare Pages 側）
+  - Cloudflare Pages の GitHub 連携で `main` 更新時に自動デプロイ
 
-### 事前準備（GitHub Repository Settings）
+### 事前準備
 
-`Settings > Secrets and variables > Actions` に以下を設定してください。
-
-- `Secrets`
-  - `CLOUDFLARE_API_TOKEN`
-  - `CLOUDFLARE_ACCOUNT_ID`
-- `Variables`
-  - `CLOUDFLARE_PAGES_PROJECT_NAME`
-
-Cloudflare API Token は Pages のデプロイ権限を持つトークンを利用してください。
+- Cloudflare Pages で GitHub リポジトリを連携
+- Production branch を `main` に設定
+- GitHub 側で `main` を保護（PR 必須 / 必要な CI チェック必須）すると、PR マージ経由のみ本番反映にできます
 
 ---
 
