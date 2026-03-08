@@ -1,0 +1,31 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 64 64"
+  role="img"
+  aria-labelledby="title"
+>
+  <title id="title">gosabun favicon</title>
+  <path
+    d="M23 16L9 32L23 48"
+    fill="none"
+    stroke="#111111"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="6"
+  />
+  <path
+    d="M41 16L55 32L41 48"
+    fill="none"
+    stroke="#111111"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="6"
+  />
+  <path
+    d="M32 13V51"
+    fill="none"
+    stroke="#111111"
+    stroke-linecap="round"
+    stroke-width="6"
+  />
+</svg>

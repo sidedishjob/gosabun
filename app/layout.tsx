@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "gosabun - テキスト差分比較",
   description: "difff互換のクライアント完結テキスト差分比較ツール",
+  icons: {
+    icon: "/favicon.svg",
+  },
 }
 
 export default function RootLayout({
