@@ -1,9 +1,9 @@
 "use client"
 
-import { CircleHelp } from "lucide-react"
+import { CircleHelp, Sun, Moon } from "lucide-react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
-import type { WordMode, Theme, DiffDisplayMode, IgnoreOptions } from "@/lib/types"
+import type { WordMode, Theme, DiffDisplayMode, IgnoreOptions, ColorMode } from "@/lib/types"
 
 const WORD_MODE_HELP: Record<WordMode, string> = {
   compat: "小文字英単語を1トークンとして比較（difff互換）",
@@ -16,10 +16,12 @@ interface OptionsBarProps {
   theme: Theme
   displayMode: DiffDisplayMode
   ignoreOptions: IgnoreOptions
+  colorMode: ColorMode
   onWordModeChange: (mode: WordMode) => void
   onThemeChange: (theme: Theme) => void
   onDisplayModeChange: (mode: DiffDisplayMode) => void
   onIgnoreOptionsChange: (options: IgnoreOptions) => void
+  onColorModeChange: (mode: ColorMode) => void
 }
 
 export function OptionsBar({
@@ -27,10 +29,12 @@ export function OptionsBar({
   theme,
   displayMode,
   ignoreOptions,
+  colorMode,
   onWordModeChange,
   onThemeChange,
   onDisplayModeChange,
   onIgnoreOptionsChange,
+  onColorModeChange,
 }: OptionsBarProps) {
   return (
     <div className="flex flex-wrap gap-6 items-center text-sm">
@@ -110,6 +114,14 @@ export function OptionsBar({
           行頭・行末の空白
         </label>
       </div>
+      <button
+        type="button"
+        onClick={() => onColorModeChange(colorMode === "light" ? "dark" : "light")}
+        className="ml-auto inline-flex h-8 w-8 items-center justify-center rounded-md border hover:bg-muted transition-colors cursor-pointer"
+        aria-label={colorMode === "light" ? "ダークモードに切替" : "ライトモードに切替"}
+      >
+        {colorMode === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+      </button>
     </div>
   )
 }

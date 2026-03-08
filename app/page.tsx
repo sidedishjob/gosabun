@@ -6,7 +6,14 @@ import { OptionsBar } from "@/components/OptionsBar"
 import { DiffViewer } from "@/components/DiffViewer"
 import { StatsRow } from "@/components/StatsRow"
 import { computeDiff } from "@/lib/diff-engine"
-import type { WordMode, Theme, DiffDisplayMode, DiffResult, IgnoreOptions } from "@/lib/types"
+import type {
+  WordMode,
+  Theme,
+  DiffDisplayMode,
+  DiffResult,
+  IgnoreOptions,
+  ColorMode,
+} from "@/lib/types"
 
 const SAMPLE_A = `探偵の田中は、深夜12時に依頼人から電話を受けた。
 「ダイヤモンドが消えた」と声は震えていた。
@@ -40,7 +47,12 @@ export default function Home() {
   const [ignoreOptions, setIgnoreOptions] = useState<IgnoreOptions>({
     ignoreTrimWhitespace: false,
   })
+  const [colorMode, setColorMode] = useState<ColorMode>("light")
   const [result, setResult] = useState<DiffResult | null>(null)
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", colorMode === "dark")
+  }, [colorMode])
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme)
@@ -97,10 +109,12 @@ export default function Home() {
           theme={theme}
           displayMode={displayMode}
           ignoreOptions={ignoreOptions}
+          colorMode={colorMode}
           onWordModeChange={setWordMode}
           onThemeChange={setTheme}
           onDisplayModeChange={setDisplayMode}
           onIgnoreOptionsChange={setIgnoreOptions}
+          onColorModeChange={setColorMode}
         />
 
         {result && (
