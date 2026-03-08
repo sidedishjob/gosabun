@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import "./globals.css"
 
 const geistSans = Geist({
@@ -27,10 +28,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex min-h-screen flex-col`}
       >
-        <main className="flex-1">{children}</main>
-        <footer className="py-4 text-center text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} gosabun
-        </footer>
+        <TooltipProvider>
+          <main className="flex-1">{children}</main>
+          <footer className="py-4 text-center text-sm text-muted-foreground">
+            &copy; {new Date().getFullYear()} gosabun
+          </footer>
+        </TooltipProvider>
       </body>
     </html>
   )

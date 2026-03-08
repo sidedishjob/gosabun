@@ -1,7 +1,15 @@
 "use client"
 
+import { CircleHelp } from "lucide-react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 import type { WordMode, Theme, DiffDisplayMode, IgnoreOptions } from "@/lib/types"
+
+const WORD_MODE_HELP: Record<WordMode, string> = {
+  compat: "小文字英単語を1トークンとして比較（difff互換）",
+  extended: "大文字小文字区別なく英単語を1トークンとして比較",
+  char: "1文字ずつ比較",
+}
 
 interface OptionsBarProps {
   wordMode: WordMode
@@ -33,18 +41,18 @@ export function OptionsBar({
           onValueChange={(v) => onWordModeChange(v as WordMode)}
           className="flex gap-3"
         >
-          <label className="flex items-center gap-1.5 cursor-pointer">
-            <RadioGroupItem value="compat" />
-            互換
-          </label>
-          <label className="flex items-center gap-1.5 cursor-pointer">
-            <RadioGroupItem value="extended" />
-            拡張
-          </label>
-          <label className="flex items-center gap-1.5 cursor-pointer">
-            <RadioGroupItem value="char" />
-            文字
-          </label>
+          {(["compat", "extended", "char"] as const).map((mode) => (
+            <label key={mode} className="flex items-center gap-1.5 cursor-pointer">
+              <RadioGroupItem value={mode} />
+              {{ compat: "互換", extended: "拡張", char: "文字" }[mode]}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <CircleHelp className="h-3.5 w-3.5 text-muted-foreground" />
+                </TooltipTrigger>
+                <TooltipContent side="top">{WORD_MODE_HELP[mode]}</TooltipContent>
+              </Tooltip>
+            </label>
+          ))}
         </RadioGroup>
       </div>
 
