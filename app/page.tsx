@@ -7,6 +7,7 @@ import { OptionsBar } from "@/components/OptionsBar"
 import { DiffViewer } from "@/components/DiffViewer"
 import { StatsRow } from "@/components/StatsRow"
 import { computeDiff } from "@/lib/diff-engine"
+import { useUndoStack } from "@/hooks/useUndoStack"
 import type {
   WordMode,
   Theme,
@@ -51,6 +52,7 @@ export default function Home() {
   const [colorMode, setColorMode] = useState<ColorMode>("light")
   const [result, setResult] = useState<DiffResult | null>(null)
   const [resultVersion, setResultVersion] = useState(0)
+  const undoStack = useUndoStack()
 
   const handleColorModeChange = useCallback((mode: ColorMode) => {
     setColorMode(mode)
@@ -72,9 +74,20 @@ export default function Home() {
     setResultVersion((v) => v + 1)
   }, [textA, textB, wordMode, ignoreOptions, canCompare])
 
+  const handleUndo = useCallback(() => {
+    const state = undoStack.pop()
+    if (!state) return
+    setTextA(state.textA)
+    setTextB(state.textB)
+    setResult(state.result)
+    setResultVersion(state.resultVersion)
+  }, [undoStack])
+
   const handleCompareRef = useRef(handleCompare)
+  const handleUndoRef = useRef(handleUndo)
   useEffect(() => {
     handleCompareRef.current = handleCompare
+    handleUndoRef.current = handleUndo
   })
 
   useEffect(() => {
@@ -83,17 +96,35 @@ export default function Home() {
         e.preventDefault()
         handleCompareRef.current()
       }
+      if ((e.metaKey || e.ctrlKey) && e.key === "z" && !e.shiftKey) {
+        const tag = (e.target as HTMLElement)?.tagName
+        if (tag === "TEXTAREA" || tag === "INPUT") return
+        e.preventDefault()
+        handleUndoRef.current()
+      }
     }
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [])
 
   function handleSwap() {
+    undoStack.push({ textA, textB, result, resultVersion })
     setTextA(textB)
     setTextB(textA)
   }
 
+  function handleClearA() {
+    undoStack.push({ textA, textB, result, resultVersion })
+    setTextA("")
+  }
+
+  function handleClearB() {
+    undoStack.push({ textA, textB, result, resultVersion })
+    setTextB("")
+  }
+
   function handleClear() {
+    undoStack.push({ textA, textB, result, resultVersion })
     setTextA("")
     setTextB("")
     setResult(null)
@@ -123,6 +154,8 @@ export default function Home() {
             textB={textB}
             onChangeA={setTextA}
             onChangeB={setTextB}
+            onClearA={handleClearA}
+            onClearB={handleClearB}
             onSwap={handleSwap}
             onCompare={handleCompare}
             onClear={handleClear}

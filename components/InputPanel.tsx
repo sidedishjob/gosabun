@@ -12,6 +12,8 @@ interface InputPanelProps {
   textB: string
   onChangeA: (value: string) => void
   onChangeB: (value: string) => void
+  onClearA: () => void
+  onClearB: () => void
   onSwap: () => void
   onCompare: () => void
   onClear: () => void
@@ -22,6 +24,8 @@ export function InputPanel({
   textB,
   onChangeA,
   onChangeB,
+  onClearA,
+  onClearB,
   onSwap,
   onCompare,
   onClear,
@@ -37,7 +41,7 @@ export function InputPanel({
           <div className="flex items-center justify-between">
             <label className="text-xs font-medium text-muted-foreground">テキスト A</label>
             {textA.length > 0 && (
-              <Button variant="ghost" size="icon-xs" onClick={() => onChangeA("")}>
+              <Button variant="ghost" size="icon-xs" onClick={onClearA}>
                 <X className="h-3.5 w-3.5" />
               </Button>
             )}
@@ -65,7 +69,7 @@ export function InputPanel({
           <div className="flex items-center justify-between">
             <label className="text-xs font-medium text-muted-foreground">テキスト B</label>
             {textB.length > 0 && (
-              <Button variant="ghost" size="icon-xs" onClick={() => onChangeB("")}>
+              <Button variant="ghost" size="icon-xs" onClick={onClearB}>
                 <X className="h-3.5 w-3.5" />
               </Button>
             )}
