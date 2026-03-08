@@ -172,8 +172,14 @@
 
 .diff-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   border-bottom: 1px solid var(--border);
+}
+
+@media (min-width: 768px) {
+  .diff-row {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .diff-row:last-child {
@@ -190,7 +196,14 @@
 }
 
 .diff-cell-a {
-  border-right: 1px solid var(--border);
+  border-bottom: 1px dashed var(--border);
+}
+
+@media (min-width: 768px) {
+  .diff-cell-a {
+    border-bottom: none;
+    border-right: 1px solid var(--border);
+  }
 }
 
 .diff-line-num {

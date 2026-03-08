@@ -31,7 +31,7 @@ export function InputPanel({
 
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-2 items-start">
         <div className="space-y-1">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium">テキスト A</label>
@@ -45,7 +45,7 @@ export function InputPanel({
             value={textA}
             onChange={(e) => onChangeA(e.target.value)}
             placeholder="比較するテキストを入力..."
-            className="field-sizing-fixed! h-80 resize-none overflow-y-auto font-mono text-sm"
+            className="field-sizing-fixed! h-48 md:h-80 resize-none overflow-y-auto font-mono text-sm"
           />
           {overLimitA && (
             <p className="text-xs text-destructive">
@@ -54,7 +54,7 @@ export function InputPanel({
           )}
         </div>
 
-        <div className="flex items-center pt-7">
+        <div className="flex justify-center items-center md:pt-7">
           <Button variant="outline" size="icon" className="h-8 w-8" onClick={onSwap}>
             <ArrowLeftRight className="h-4 w-4" />
           </Button>
@@ -73,7 +73,7 @@ export function InputPanel({
             value={textB}
             onChange={(e) => onChangeB(e.target.value)}
             placeholder="比較するテキストを入力..."
-            className="field-sizing-fixed! h-80 resize-none overflow-y-auto font-mono text-sm"
+            className="field-sizing-fixed! h-48 md:h-80 resize-none overflow-y-auto font-mono text-sm"
           />
           {overLimitB && (
             <p className="text-xs text-destructive">

@@ -120,7 +120,7 @@ export default function Home() {
         {result && (
           <>
             <DiffViewer result={result} displayMode={displayMode} />
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <StatsRow label="テキスト A" stats={result.statsA} />
               <StatsRow label="テキスト B" stats={result.statsB} />
             </div>
