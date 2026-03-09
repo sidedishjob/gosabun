@@ -44,7 +44,7 @@ The quick brown cat jumps over the lazy　dog.
 export default function Home() {
   const [textA, setTextA] = useState(SAMPLE_A)
   const [textB, setTextB] = useState(SAMPLE_B)
-  const [wordMode, setWordMode] = useState<WordMode>("compat")
+  const [wordMode, setWordMode] = useState<WordMode>("word")
   const [theme, setTheme] = useState<Theme>("color1")
   const [displayMode, setDisplayMode] = useState<DiffDisplayMode>("all")
   const [ignoreOptions, setIgnoreOptions] = useState<IgnoreOptions>({

@@ -43,7 +43,7 @@ export interface DiffResult {
   truncated: boolean
 }
 
-export type WordMode = "compat" | "extended" | "char"
+export type WordMode = "word" | "char"
 
 export type Theme = "color1" | "color2" | "mono"
 

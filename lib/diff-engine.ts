@@ -32,8 +32,7 @@ export function splitText(text: string, mode: WordMode): DiffToken[] {
     return tokens
   }
 
-  const wordPattern =
-    mode === "compat" ? /^([a-z]+|<\$>|&#?\w+;|[\s\S])/ : /^([A-Za-z]+|<\$>|&#?\w+;|[\s\S])/
+  const wordPattern = /^([a-z]+|<\$>|&#?\w+;|[\s\S])/
 
   const tokens: DiffToken[] = []
   let remaining = replaced
@@ -48,7 +47,7 @@ export function splitText(text: string, mode: WordMode): DiffToken[] {
       type = "newline"
     } else if (/^&#?\w+;$/.test(value)) {
       type = "entity"
-    } else if (mode === "compat" ? /^[a-z]+$/.test(value) : /^[A-Za-z]+$/.test(value)) {
+    } else if (/^[a-z]+$/.test(value)) {
       type = "word"
     } else {
       type = "char"
