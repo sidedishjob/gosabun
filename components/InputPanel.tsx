@@ -43,7 +43,7 @@ export function InputPanel({
               variant="ghost"
               size="icon-xs"
               onClick={onClearA}
-              className={`relative before:absolute before:-inset-2 before:content-[''] ${textA.length === 0 ? "invisible" : ""}`}
+              className={`relative transition-none before:absolute before:-inset-2 before:content-[''] ${textA.length === 0 ? "invisible" : ""}`}
             >
               <X className="h-3.5 w-3.5" />
             </Button>
@@ -74,7 +74,7 @@ export function InputPanel({
               variant="ghost"
               size="icon-xs"
               onClick={onClearB}
-              className={`relative before:absolute before:-inset-2 before:content-[''] ${textB.length === 0 ? "invisible" : ""}`}
+              className={`relative transition-none before:absolute before:-inset-2 before:content-[''] ${textB.length === 0 ? "invisible" : ""}`}
             >
               <X className="h-3.5 w-3.5" />
             </Button>

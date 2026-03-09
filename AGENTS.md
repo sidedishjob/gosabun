@@ -37,6 +37,13 @@ This file provides guidance to AI Agents (open.ai/codex, claude.ai/claude code) 
 
 ---
 
+## コードスタイル（Code style）
+
+- Prettier: `printWidth: 100`（1行100文字以内に収めること）
+- ESLint: `react-hooks/set-state-in-effect`（useEffect 内での setState 禁止）、`react-hooks/refs`（レンダー中の ref アクセス禁止）が有効
+
+---
+
 ## 品質ゲート（Quality gates）
 
 実装・修正後は必ず以下のコマンドを実行する。
