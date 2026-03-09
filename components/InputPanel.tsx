@@ -54,6 +54,12 @@ export function InputPanel({
             id="text-a"
             value={textA}
             onChange={(e) => onChangeA(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Tab" && !e.shiftKey) {
+                e.preventDefault()
+                document.getElementById("text-b")?.focus()
+              }
+            }}
             placeholder="比較するテキストを入力..."
             className="field-sizing-fixed h-48 md:h-72 resize-none overflow-y-auto font-mono text-sm"
           />
@@ -88,6 +94,12 @@ export function InputPanel({
             id="text-b"
             value={textB}
             onChange={(e) => onChangeB(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Tab" && e.shiftKey) {
+                e.preventDefault()
+                document.getElementById("text-a")?.focus()
+              }
+            }}
             placeholder="比較するテキストを入力..."
             className="field-sizing-fixed h-48 md:h-72 resize-none overflow-y-auto font-mono text-sm"
           />
