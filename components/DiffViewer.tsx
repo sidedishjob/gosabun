@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback, useRef } from "react"
 import { ChevronUp, ChevronDown } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import type { DiffResult, DiffRowModel, DiffDisplayMode } from "@/lib/types"
 import { DiffRow } from "./DiffRow"
 
@@ -94,22 +95,12 @@ export function DiffViewer({ result, displayMode }: DiffViewerProps) {
         <span className="tabular-nums" aria-live="polite" aria-atomic="true">
           {currentChangeIdx >= 0 ? currentChangeIdx + 1 : "-"} / {changeIndices.length} 件
         </span>
-        <button
-          type="button"
-          onClick={handlePrev}
-          className="inline-flex h-6 w-6 items-center justify-center rounded-md border hover:bg-muted transition-colors cursor-pointer"
-          aria-label="前の変更箇所"
-        >
+        <Button variant="outline" size="icon-xs" onClick={handlePrev} aria-label="前の変更箇所">
           <ChevronUp className="h-3.5 w-3.5" />
-        </button>
-        <button
-          type="button"
-          onClick={handleNext}
-          className="inline-flex h-6 w-6 items-center justify-center rounded-md border hover:bg-muted transition-colors cursor-pointer"
-          aria-label="次の変更箇所"
-        >
+        </Button>
+        <Button variant="outline" size="icon-xs" onClick={handleNext} aria-label="次の変更箇所">
           <ChevronDown className="h-3.5 w-3.5" />
-        </button>
+        </Button>
       </div>
       <div ref={containerRef} className="diff-viewer overflow-x-auto rounded-md border">
         {displayRows.map(({ row, originalIndex }, i) => (

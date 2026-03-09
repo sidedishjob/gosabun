@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react"
 import { Moon, Sun } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { InputPanel } from "@/components/InputPanel"
 import { OptionsBar } from "@/components/OptionsBar"
 import { DiffViewer } from "@/components/DiffViewer"
@@ -135,21 +136,21 @@ export default function Home() {
   }
 
   return (
-    <div className="bg-background">
+    <div>
       <div className="mx-auto max-w-6xl px-4 py-4 md:py-6">
         <header className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-xl font-bold tracking-tight">gosabun</h1>
             <p className="text-xs text-muted-foreground">テキスト差分比較</p>
           </div>
-          <button
-            type="button"
+          <Button
+            variant="outline"
+            size="icon-sm"
             onClick={() => handleColorModeChange(colorMode === "light" ? "dark" : "light")}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md border hover:bg-muted transition-colors cursor-pointer"
             aria-label={colorMode === "light" ? "ダークモードに切替" : "ライトモードに切替"}
           >
             {colorMode === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-          </button>
+          </Button>
         </header>
 
         <div className="space-y-4">
