@@ -111,6 +111,7 @@ export function OptionsBar({
 
       <label className="flex items-center gap-1.5 text-xs cursor-pointer select-none">
         <input
+          id="ignore-trim-whitespace"
           type="checkbox"
           checked={ignoreOptions.ignoreTrimWhitespace}
           onChange={(e) =>

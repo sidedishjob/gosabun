@@ -38,7 +38,9 @@ export function InputPanel({
       <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-2 items-start">
         <div className="space-y-1">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-medium text-muted-foreground">テキスト A</label>
+            <label htmlFor="text-a" className="text-xs font-medium text-muted-foreground">
+              テキスト A
+            </label>
             <Button
               variant="ghost"
               size="icon-xs"
@@ -49,6 +51,7 @@ export function InputPanel({
             </Button>
           </div>
           <Textarea
+            id="text-a"
             value={textA}
             onChange={(e) => onChangeA(e.target.value)}
             placeholder="比較するテキストを入力..."
@@ -69,7 +72,9 @@ export function InputPanel({
 
         <div className="space-y-1">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-medium text-muted-foreground">テキスト B</label>
+            <label htmlFor="text-b" className="text-xs font-medium text-muted-foreground">
+              テキスト B
+            </label>
             <Button
               variant="ghost"
               size="icon-xs"
@@ -80,6 +85,7 @@ export function InputPanel({
             </Button>
           </div>
           <Textarea
+            id="text-b"
             value={textB}
             onChange={(e) => onChangeB(e.target.value)}
             placeholder="比較するテキストを入力..."
