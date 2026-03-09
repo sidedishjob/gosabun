@@ -135,7 +135,7 @@ export default function Home() {
   }
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="bg-background">
       <div className="mx-auto max-w-6xl px-4 py-4 md:py-6">
         <header className="flex items-center justify-between mb-6">
           <div>
