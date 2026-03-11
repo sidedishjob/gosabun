@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react"
 import type { DiffResult } from "@/lib/types"
+import { UNDO_MAX_DEPTH } from "@/lib/constants"
 
 export interface UndoState {
   textA: string
@@ -10,13 +11,11 @@ export interface UndoState {
   resultVersion: number
 }
 
-const MAX_DEPTH = 10
-
 export function useUndoStack() {
   const [stack, setStack] = useState<UndoState[]>([])
 
   const push = useCallback((state: UndoState) => {
-    setStack((prev) => [...prev, state].slice(-MAX_DEPTH))
+    setStack((prev) => [...prev, state].slice(-UNDO_MAX_DEPTH))
   }, [])
 
   const pop = useCallback((): UndoState | null => {
