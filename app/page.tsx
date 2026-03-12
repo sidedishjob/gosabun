@@ -1,50 +1,30 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useCallback } from "react"
 import { Moon, Sun } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { InputPanel } from "@/components/InputPanel"
 import { OptionsBar } from "@/components/OptionsBar"
 import { DiffViewer } from "@/components/DiffViewer"
 import { StatsRow } from "@/components/StatsRow"
-import { computeDiff } from "@/lib/diff-engine"
-import { useUndoStack } from "@/hooks/useUndoStack"
-import { MAX_TEXT_LENGTH } from "@/lib/constants"
-import type {
-  WordMode,
-  Theme,
-  DiffDisplayMode,
-  DiffResult,
-  IgnoreOptions,
-  ColorMode,
-} from "@/lib/types"
-
-const SAMPLE_A = `探偵の田中は、深夜12時に依頼人から電話を受けた。
-「ダイヤモンドが消えた」と声は震えていた。
-現場はNewYorkの高級ホテル、MacDonald Suiteの305号室。
-The suspect left no fingerprints at the scene.
-部屋には不審な足跡と、半分飲まれたワインが残されていた。
-金庫は無傷のまま、窓だけが開け放たれていた。
-The quick brown fox jumps over the lazy dog.
-田中は静かにメモを取りながら、容疑者を絞り込んでいった。
-容疑者リスト: 3名
-この行はオリジナルにのみ存在する。`
-
-const SAMPLE_B = `探偵の鈴木は、深夜12時に依頼人から電話を受けた。
-「エメラルドが消えた」と声は震えていた。
-現場はNewJerseyの高級ホテル、MacArthur Suiteの305号室。
-The Suspect left no Fingerprints at the scene.
-部屋には不審な足跡と、半分飲まれたワインが残されていた。
-  金庫は無傷のまま、窓だけが開け放たれていた。
-The quick brown cat jumps over the lazy　dog.
-鈴木は静かにメモを取りながら、容疑者 を絞り込んでいった。
-
-容疑者リスト： 5名
-この行は改訂版にのみ存在する。`
+import { useTextInput } from "@/hooks/useTextInput"
+import { useDiffCompare } from "@/hooks/useDiffCompare"
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts"
+import type { WordMode, Theme, DiffDisplayMode, IgnoreOptions, ColorMode } from "@/lib/types"
 
 export default function Home() {
-  const [textA, setTextA] = useState(SAMPLE_A)
-  const [textB, setTextB] = useState(SAMPLE_B)
+  const {
+    textA,
+    textB,
+    setTextA,
+    setTextB,
+    handleSwap,
+    handleClearA,
+    handleClearB,
+    handleClearAll,
+    restoreFromUndo,
+  } = useTextInput()
+
   const [wordMode, setWordMode] = useState<WordMode>("word")
   const [theme, setTheme] = useState<Theme>("color1")
   const [displayMode, setDisplayMode] = useState<DiffDisplayMode>("all")
@@ -52,9 +32,27 @@ export default function Home() {
     ignoreTrimWhitespace: false,
   })
   const [colorMode, setColorMode] = useState<ColorMode>("light")
-  const [result, setResult] = useState<DiffResult | null>(null)
-  const [resultVersion, setResultVersion] = useState(0)
-  const undoStack = useUndoStack()
+
+  const { result, setResult, resultVersion, setResultVersion, handleCompare } = useDiffCompare(
+    textA,
+    textB,
+    wordMode,
+    ignoreOptions
+  )
+
+  const diffSnapshot = { result, resultVersion }
+
+  const handleUndo = useCallback(() => {
+    const state = restoreFromUndo()
+    if (!state) return
+    setResult(state.result)
+    setResultVersion(state.resultVersion)
+  }, [restoreFromUndo, setResult, setResultVersion])
+
+  useKeyboardShortcuts({
+    onCompare: handleCompare,
+    onUndo: handleUndo,
+  })
 
   const handleColorModeChange = useCallback((mode: ColorMode) => {
     setColorMode(mode)
@@ -65,75 +63,6 @@ export default function Home() {
     setTheme(t)
     document.documentElement.setAttribute("data-theme", t)
   }, [])
-
-  const canCompare =
-    textA.length > 0 &&
-    textB.length > 0 &&
-    textA.length <= MAX_TEXT_LENGTH &&
-    textB.length <= MAX_TEXT_LENGTH
-
-  const handleCompare = useCallback(() => {
-    if (!canCompare) return
-    const r = computeDiff(textA, textB, wordMode, ignoreOptions)
-    setResult(r)
-    setResultVersion((v) => v + 1)
-  }, [textA, textB, wordMode, ignoreOptions, canCompare])
-
-  const handleUndo = useCallback(() => {
-    const state = undoStack.pop()
-    if (!state) return
-    setTextA(state.textA)
-    setTextB(state.textB)
-    setResult(state.result)
-    setResultVersion(state.resultVersion)
-  }, [undoStack])
-
-  const handleCompareRef = useRef(handleCompare)
-  const handleUndoRef = useRef(handleUndo)
-  useEffect(() => {
-    handleCompareRef.current = handleCompare
-    handleUndoRef.current = handleUndo
-  })
-
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
-        e.preventDefault()
-        handleCompareRef.current()
-      }
-      if ((e.metaKey || e.ctrlKey) && e.key === "z" && !e.shiftKey) {
-        const tag = (e.target as HTMLElement)?.tagName
-        if (tag === "TEXTAREA" || tag === "INPUT") return
-        e.preventDefault()
-        handleUndoRef.current()
-      }
-    }
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [])
-
-  function handleSwap() {
-    undoStack.push({ textA, textB, result, resultVersion })
-    setTextA(textB)
-    setTextB(textA)
-  }
-
-  function handleClearA() {
-    undoStack.push({ textA, textB, result, resultVersion })
-    setTextA("")
-  }
-
-  function handleClearB() {
-    undoStack.push({ textA, textB, result, resultVersion })
-    setTextB("")
-  }
-
-  function handleClear() {
-    undoStack.push({ textA, textB, result, resultVersion })
-    setTextA("")
-    setTextB("")
-    setResult(null)
-  }
 
   return (
     <div>
@@ -159,11 +88,14 @@ export default function Home() {
             textB={textB}
             onChangeA={setTextA}
             onChangeB={setTextB}
-            onClearA={handleClearA}
-            onClearB={handleClearB}
-            onSwap={handleSwap}
+            onClearA={() => handleClearA(diffSnapshot)}
+            onClearB={() => handleClearB(diffSnapshot)}
+            onSwap={() => handleSwap(diffSnapshot)}
             onCompare={handleCompare}
-            onClear={handleClear}
+            onClear={() => {
+              handleClearAll(diffSnapshot)
+              setResult(null)
+            }}
           />
 
           <OptionsBar
