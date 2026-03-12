@@ -3,12 +3,12 @@
 import { CircleHelp } from "lucide-react"
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 import type { WordMode, Theme, DiffDisplayMode, IgnoreOptions } from "@/lib/types"
-
-interface SegmentOption<T extends string> {
-  value: T
-  label: string
-  tooltip?: string
-}
+import {
+  WORD_MODE_OPTIONS,
+  THEME_OPTIONS,
+  DIFF_DISPLAY_MODE_OPTIONS,
+  type SegmentOption,
+} from "@/lib/constants"
 
 function SegmentedControl<T extends string>({
   options,
@@ -72,38 +72,26 @@ export function OptionsBar({
   onDisplayModeChange,
   onIgnoreOptionsChange,
 }: OptionsBarProps) {
-  const wordModeOptions: SegmentOption<WordMode>[] = [
-    { value: "word", label: "単語" },
-    { value: "char", label: "1文字" },
-  ]
-
-  const themeOptions: SegmentOption<Theme>[] = [
-    { value: "color1", label: "青" },
-    { value: "color2", label: "緑" },
-    { value: "mono", label: "モノ" },
-  ]
-
-  const displayOptions: SegmentOption<DiffDisplayMode>[] = [
-    { value: "all", label: "全体" },
-    { value: "diff-only", label: "差分のみ" },
-  ]
-
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
       <div className="flex items-center gap-1.5">
         <span className="text-xs text-muted-foreground">比較</span>
-        <SegmentedControl options={wordModeOptions} value={wordMode} onChange={onWordModeChange} />
+        <SegmentedControl
+          options={WORD_MODE_OPTIONS}
+          value={wordMode}
+          onChange={onWordModeChange}
+        />
       </div>
 
       <div className="flex items-center gap-1.5">
         <span className="text-xs text-muted-foreground">配色</span>
-        <SegmentedControl options={themeOptions} value={theme} onChange={onThemeChange} />
+        <SegmentedControl options={THEME_OPTIONS} value={theme} onChange={onThemeChange} />
       </div>
 
       <div className="flex items-center gap-1.5">
         <span className="text-xs text-muted-foreground">表示</span>
         <SegmentedControl
-          options={displayOptions}
+          options={DIFF_DISPLAY_MODE_OPTIONS}
           value={displayMode}
           onChange={onDisplayModeChange}
         />
