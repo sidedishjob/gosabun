@@ -13,6 +13,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 })
 
+const SITE_URL = "https://gosabun.pages.dev"
+
 export const metadata: Metadata = {
   title: "gosabun - テキスト差分比較",
   description: "サーバー送信なし。ブラウザ完結のテキスト差分比較ツール",
@@ -23,11 +25,15 @@ export const metadata: Metadata = {
     title: "gosabun - テキスト差分比較",
     description: "サーバー送信なし。ブラウザ完結のテキスト差分比較ツール",
     type: "website",
+    url: SITE_URL,
+    locale: "ja_JP",
+    images: [{ url: `${SITE_URL}/og-image.png`, width: 1200, height: 630 }],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "gosabun - テキスト差分比較",
     description: "サーバー送信なし。ブラウザ完結のテキスト差分比較ツール",
+    images: [`${SITE_URL}/og-image.png`],
   },
 }
 
