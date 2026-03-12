@@ -120,6 +120,7 @@ npm run dev
 ```bash
 npm run dev          # 開発サーバー起動
 npm run build        # プロダクションビルド
+npm run test         # ユニットテスト実行
 npm run lint         # ESLint 実行
 npm run format       # Prettier フォーマット
 npm run format:check # フォーマットチェック
@@ -132,7 +133,7 @@ npm run format:check # フォーマットチェック
 本リポジトリでは、CI は GitHub Actions、CD は Cloudflare Pages の Git 連携で運用します。
 
 - CI（`.github/workflows/ci.yml`）
-  - `develop` / `main` 向け PR で `lint` / `format:check` / `build` を実行
+  - `develop` / `main` 向け PR で `test` / `lint` / `format:check` / `build` を実行
   - `develop` への push でも同じ検証を実行
 - CD（Cloudflare Pages 側）
   - Cloudflare Pages の GitHub 連携で `main` 更新時に自動デプロイ
