@@ -7,6 +7,7 @@ import { InputPanel } from "@/components/InputPanel"
 import { OptionsBar } from "@/components/OptionsBar"
 import { DiffViewer } from "@/components/DiffViewer"
 import { StatsRow } from "@/components/StatsRow"
+import { ErrorBoundary } from "@/components/ErrorBoundary"
 import { useTextInput } from "@/hooks/useTextInput"
 import { useDiffCompare } from "@/hooks/useDiffCompare"
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts"
@@ -110,13 +111,13 @@ export default function Home() {
           />
 
           {result && (
-            <>
+            <ErrorBoundary>
               <DiffViewer key={resultVersion} result={result} displayMode={displayMode} />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <StatsRow label="テキスト A" stats={result.statsA} />
                 <StatsRow label="テキスト B" stats={result.statsB} />
               </div>
-            </>
+            </ErrorBoundary>
           )}
         </div>
       </div>
