@@ -8,7 +8,15 @@ import { ArrowLeftRight, Upload, X } from "lucide-react"
 import { MAX_TEXT_LENGTH } from "@/lib/constants"
 
 const ACCEPTED_EXTENSIONS = [".txt", ".md", ".csv", ".json", ".xml", ".html"]
-const ACCEPTED_MIME_TYPES = "text/plain,text/markdown,text/csv,application/json,text/xml,text/html"
+const ACCEPTED_MIME_TYPES = [
+  ...ACCEPTED_EXTENSIONS,
+  "text/plain",
+  "text/markdown",
+  "text/csv",
+  "application/json",
+  "text/xml",
+  "text/html",
+].join(",")
 
 function readFileAsText(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
