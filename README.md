@@ -2,7 +2,7 @@
 
 ## ブラウザだけで完結するテキスト差分比較ツール
 
-[機能](#機能) · [使い方](#使い方) · [インストール](#インストール) · [カスタマイズ](#カスタマイズ)
+[デモ](https://gosabun.pages.dev) · [機能](#機能) · [使い方](#使い方) · [インストール](#インストール) · [カスタマイズ](#カスタマイズ) · [技術スタック](#技術スタック) · [開発](#開発)
 
 ---
 
@@ -51,6 +51,8 @@ gosabun はシンプルな UI をベースに、**クライアント完結**・*
 ---
 
 ## インストール
+
+**前提条件**: Node.js 20 以上
 
 ```bash
 git clone https://github.com/sidedishjob/gosabun.git
@@ -120,6 +122,7 @@ npm run dev
 ```bash
 npm run dev          # 開発サーバー起動
 npm run build        # プロダクションビルド
+npm run start        # プロダクションサーバー起動
 npm run test         # ユニットテスト実行
 npm run lint         # ESLint 実行
 npm run format       # Prettier フォーマット
