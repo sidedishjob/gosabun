@@ -39,10 +39,14 @@ function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
 
   const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(text).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1500)
-    })
+    if (!navigator.clipboard) return
+    navigator.clipboard.writeText(text).then(
+      () => {
+        setCopied(true)
+        setTimeout(() => setCopied(false), 1500)
+      },
+      () => {}
+    )
   }, [text])
 
   if (!text) return null
