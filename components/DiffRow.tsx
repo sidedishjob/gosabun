@@ -1,5 +1,7 @@
 "use client"
 
+import { useState, useCallback } from "react"
+import { Copy, Check } from "lucide-react"
 import type { DiffCellModel, DiffSegment, DiffToken } from "@/lib/types"
 
 function replaceTrailingSpaces(tokens: DiffToken[]): DiffToken[] {
@@ -27,6 +29,37 @@ function renderSegment(segment: DiffSegment, segIndex: number, isHighlightSide: 
     )
   }
   return <span key={segIndex}>{text}</span>
+}
+
+function getCellText(cell: DiffCellModel): string {
+  return cell.segments.flatMap((s) => s.tokens.map((t) => t.value)).join("")
+}
+
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = useCallback(() => {
+    if (!navigator.clipboard) return
+    navigator.clipboard.writeText(text).then(
+      () => {
+        setCopied(true)
+        setTimeout(() => setCopied(false), 1500)
+      },
+      () => {}
+    )
+  }, [text])
+
+  if (!text) return null
+
+  return (
+    <button type="button" className="diff-copy-btn" onClick={handleCopy} aria-label="行をコピー">
+      {copied ? (
+        <Check className="h-3 w-3 text-green-600 dark:text-green-400" />
+      ) : (
+        <Copy className="h-3 w-3" />
+      )}
+    </button>
+  )
 }
 
 function renderCell(cell: DiffCellModel, side: "a" | "b") {
@@ -59,10 +92,12 @@ export function DiffRow({ a, b, lineA, lineB, rowIndex, changed, highlighted }: 
       <div className={`diff-cell diff-cell-a${paddingA ? " diff-cell-empty" : ""}`}>
         <span className="diff-line-num">{lineA ?? ""}</span>
         <span className="diff-cell-content">{renderCell(a, "a")}</span>
+        {!paddingA && <CopyButton text={getCellText(a)} />}
       </div>
       <div className={`diff-cell diff-cell-b${paddingB ? " diff-cell-empty" : ""}`}>
         <span className="diff-line-num">{lineB ?? ""}</span>
         <span className="diff-cell-content">{renderCell(b, "b")}</span>
+        {!paddingB && <CopyButton text={getCellText(b)} />}
       </div>
     </div>
   )
