@@ -221,6 +221,34 @@
   min-width: 0;
 }
 
+.diff-cell {
+  position: relative;
+}
+
+.diff-copy-btn {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  padding: 2px;
+  border-radius: 4px;
+  color: var(--muted-foreground);
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  background: var(--background);
+  border: 1px solid var(--border);
+  line-height: 1;
+}
+
+.diff-cell:hover .diff-copy-btn {
+  opacity: 1;
+}
+
+.diff-copy-btn:hover {
+  color: var(--foreground);
+  background: var(--accent);
+}
+
 .diff-cell-empty {
   background-color: var(--muted);
 }
