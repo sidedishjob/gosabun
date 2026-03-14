@@ -99,14 +99,14 @@ export function InputPanel({
 
   const handleDragLeaveA = useCallback((e: React.DragEvent) => {
     e.preventDefault()
-    dragCounterA.current -= 1
-    if (dragCounterA.current === 0) setDragOverA(false)
+    dragCounterA.current = Math.max(0, dragCounterA.current - 1)
+    if (dragCounterA.current <= 0) setDragOverA(false)
   }, [])
 
   const handleDragLeaveB = useCallback((e: React.DragEvent) => {
     e.preventDefault()
-    dragCounterB.current -= 1
-    if (dragCounterB.current === 0) setDragOverB(false)
+    dragCounterB.current = Math.max(0, dragCounterB.current - 1)
+    if (dragCounterB.current <= 0) setDragOverB(false)
   }, [])
 
   const handleDropA = useCallback(
