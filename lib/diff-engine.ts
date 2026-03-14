@@ -1,4 +1,4 @@
-import { diffArrays } from "diff"
+import { diffArrays, diffLines } from "diff"
 import type {
   DiffToken,
   DiffChunk,
@@ -128,119 +128,186 @@ function computeChunks(tokensA: DiffToken[], tokensB: DiffToken[]): DiffChunk[] 
   return chunks
 }
 
-function isNewline(token: DiffToken): boolean {
-  return token.type === "newline" && token.value === NEWLINE_MARKER
+type LinePairType = "equal" | "delete" | "insert" | "replace"
+interface LinePair {
+  type: LinePairType
+  linesA: string[]
+  linesB: string[]
 }
 
-function splitByNewline(tokens: DiffToken[]): DiffToken[][] {
-  const lines: DiffToken[][] = [[]]
-  for (const token of tokens) {
-    if (isNewline(token)) {
-      lines.push([])
+function computeLinePairs(textA: string, textB: string): LinePair[] {
+  const normalizedA = textA.replace(/\r\n?/g, "\n")
+  const normalizedB = textB.replace(/\r\n?/g, "\n")
+  const changes = diffLines(normalizedA, normalizedB)
+
+  // Merge consecutive removed+added into replace
+  interface TaggedChange {
+    type: "equal" | "delete" | "insert" | "replace"
+    valueA: string
+    valueB: string
+  }
+  const merged: TaggedChange[] = []
+  for (let i = 0; i < changes.length; i++) {
+    const c = changes[i]
+    if (c.removed && i + 1 < changes.length && changes[i + 1].added) {
+      const next = changes[i + 1]
+      merged.push({ type: "replace", valueA: c.value, valueB: next.value })
+      i++
+    } else if (c.removed) {
+      merged.push({ type: "delete", valueA: c.value, valueB: "" })
+    } else if (c.added) {
+      merged.push({ type: "insert", valueA: "", valueB: c.value })
     } else {
-      lines[lines.length - 1].push(token)
+      merged.push({ type: "equal", valueA: c.value, valueB: c.value })
     }
   }
-  return lines
+
+  // Split values into line arrays (strip trailing empty element from split)
+  function splitLines(value: string): string[] {
+    if (value === "") return []
+    const lines = value.split("\n")
+    if (lines[lines.length - 1] === "") lines.pop()
+    return lines
+  }
+
+  return merged.map((m) => ({
+    type: m.type,
+    linesA: splitLines(m.valueA),
+    linesB: splitLines(m.valueB),
+  }))
 }
 
-function buildRows(chunks: DiffChunk[]): DiffRowModel[] {
-  let currentA: DiffSegment[] = []
-  let currentB: DiffSegment[] = []
-  let lineA = 0
-  let lineB = 0
-  // Track which side "owns" the newline that triggers the next flush.
-  // Set BEFORE flushRow() so the flushed row gets the correct line numbers.
-  let newlineA = false
-  let newlineB = false
-  const rows: DiffRowModel[] = []
-
-  function flushRow() {
-    if (currentA.length === 0 && currentB.length === 0 && !newlineA && !newlineB) return
-    const hasA = currentA.length > 0 || newlineA
-    const hasB = currentB.length > 0 || newlineB
-    if (hasA) lineA++
-    if (hasB) lineB++
-    rows.push({
-      a: { segments: currentA },
-      b: { segments: currentB },
-      lineA: hasA ? lineA : undefined,
-      lineB: hasB ? lineB : undefined,
-    })
-    currentA = []
-    currentB = []
-    newlineA = false
-    newlineB = false
-  }
+function chunksToSegments(chunks: DiffChunk[]): {
+  segmentsA: DiffSegment[]
+  segmentsB: DiffSegment[]
+} {
+  const segmentsA: DiffSegment[] = []
+  const segmentsB: DiffSegment[] = []
 
   for (const chunk of chunks) {
     switch (chunk.type) {
-      case "equal": {
-        const lines = splitByNewline(chunk.tokensA)
-        for (let i = 0; i < lines.length; i++) {
-          if (i > 0) {
-            newlineA = true
-            newlineB = true
-            flushRow()
-          }
-          if (lines[i].length > 0) {
-            const seg: DiffSegment = { tokens: lines[i], type: "equal" }
-            currentA.push(seg)
-            currentB.push(seg)
-          }
+      case "equal":
+        if (chunk.tokensA.length > 0) {
+          const seg: DiffSegment = { tokens: chunk.tokensA, type: "equal" }
+          segmentsA.push(seg)
+          segmentsB.push(seg)
         }
         break
-      }
-      case "delete": {
-        const lines = splitByNewline(chunk.tokensA)
-        for (let i = 0; i < lines.length; i++) {
-          if (i > 0) {
-            newlineA = true
-            flushRow()
-          }
-          if (lines[i].length > 0) {
-            currentA.push({ tokens: lines[i], type: "delete" })
-          }
+      case "delete":
+        if (chunk.tokensA.length > 0) {
+          segmentsA.push({ tokens: chunk.tokensA, type: "delete" })
         }
         break
-      }
-      case "insert": {
-        const lines = splitByNewline(chunk.tokensB)
-        for (let i = 0; i < lines.length; i++) {
-          if (i > 0) {
-            newlineB = true
-            flushRow()
-          }
-          if (lines[i].length > 0) {
-            currentB.push({ tokens: lines[i], type: "insert" })
-          }
+      case "insert":
+        if (chunk.tokensB.length > 0) {
+          segmentsB.push({ tokens: chunk.tokensB, type: "insert" })
         }
         break
-      }
+      case "replace":
+        if (chunk.tokensA.length > 0) {
+          segmentsA.push({ tokens: chunk.tokensA, type: "delete" })
+        }
+        if (chunk.tokensB.length > 0) {
+          segmentsB.push({ tokens: chunk.tokensB, type: "insert" })
+        }
+        break
+    }
+  }
+
+  return { segmentsA, segmentsB }
+}
+
+function buildRowsFromPairs(pairs: LinePair[], mode: WordMode): DiffRowModel[] {
+  const rows: DiffRowModel[] = []
+  let lineA = 0
+  let lineB = 0
+
+  for (const pair of pairs) {
+    switch (pair.type) {
+      case "equal":
+        for (const line of pair.linesA) {
+          lineA++
+          lineB++
+          const tokens = splitText(line, mode)
+          const seg: DiffSegment = { tokens, type: "equal" }
+          rows.push({
+            a: { segments: tokens.length > 0 ? [seg] : [] },
+            b: { segments: tokens.length > 0 ? [seg] : [] },
+            lineA,
+            lineB,
+          })
+        }
+        break
+      case "delete":
+        for (const line of pair.linesA) {
+          lineA++
+          const tokens = splitText(line, mode)
+          rows.push({
+            a: { segments: tokens.length > 0 ? [{ tokens, type: "delete" }] : [] },
+            b: { segments: [] },
+            lineA,
+            lineB: undefined,
+          })
+        }
+        break
+      case "insert":
+        for (const line of pair.linesB) {
+          lineB++
+          const tokens = splitText(line, mode)
+          rows.push({
+            a: { segments: [] },
+            b: { segments: tokens.length > 0 ? [{ tokens, type: "insert" }] : [] },
+            lineA: undefined,
+            lineB,
+          })
+        }
+        break
       case "replace": {
-        const linesA = splitByNewline(chunk.tokensA)
-        const linesB = splitByNewline(chunk.tokensB)
-        const maxLines = Math.max(linesA.length, linesB.length)
-        for (let i = 0; i < maxLines; i++) {
-          if (i > 0) {
-            if (i < linesA.length) newlineA = true
-            if (i < linesB.length) newlineB = true
-            flushRow()
-          }
-          if (i < linesA.length && linesA[i].length > 0) {
-            currentA.push({ tokens: linesA[i], type: "delete" })
-          }
-          if (i < linesB.length && linesB[i].length > 0) {
-            currentB.push({ tokens: linesB[i], type: "insert" })
+        const maxLen = Math.max(pair.linesA.length, pair.linesB.length)
+        for (let i = 0; i < maxLen; i++) {
+          const hasA = i < pair.linesA.length
+          const hasB = i < pair.linesB.length
+          if (hasA) lineA++
+          if (hasB) lineB++
+
+          if (hasA && hasB) {
+            // Inline token diff for paired lines
+            const tokA = splitText(pair.linesA[i], mode)
+            const tokB = splitText(pair.linesB[i], mode)
+            const chunks = computeChunks(tokA, tokB)
+            const { segmentsA, segmentsB } = chunksToSegments(chunks)
+            rows.push({
+              a: { segments: segmentsA },
+              b: { segments: segmentsB },
+              lineA,
+              lineB,
+            })
+          } else if (hasA) {
+            const tokens = splitText(pair.linesA[i], mode)
+            rows.push({
+              a: {
+                segments: tokens.length > 0 ? [{ tokens, type: "delete" }] : [],
+              },
+              b: { segments: [] },
+              lineA,
+              lineB: undefined,
+            })
+          } else {
+            const tokens = splitText(pair.linesB[i], mode)
+            rows.push({
+              a: { segments: [] },
+              b: {
+                segments: tokens.length > 0 ? [{ tokens, type: "insert" }] : [],
+              },
+              lineA: undefined,
+              lineB,
+            })
           }
         }
         break
       }
     }
   }
-
-  // Flush remaining
-  flushRow()
 
   return rows
 }
@@ -294,10 +361,8 @@ export function computeDiff(
     return { rows: [], statsA, statsB, truncated: true }
   }
 
-  const tokensA = splitText(textA, mode)
-  const tokensB = splitText(textB, mode)
-  const chunks = computeChunks(tokensA, tokensB)
-  let rows = buildRows(chunks)
+  const linePairs = computeLinePairs(textA, textB)
+  let rows = buildRowsFromPairs(linePairs, mode)
 
   if (ignoreOptions) {
     rows = applyIgnoreOptions(rows, ignoreOptions)
