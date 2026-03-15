@@ -68,12 +68,9 @@ npm run lint && npm run format:check
 
 ## PR作成ルール（Pull request）
 
-- PR作成時は必ず `.github/pull_request_template.md` を使用する。
-- PRタイトルは原則 `prefix: 説明` 形式に統一する（`feat` / `fix` / `change` / `refactor` / `docs` / `test` / `chore` / `release`）。
-- テンプレートの項目（概要 / 変更内容 / 補足）は省略せずに記載する。
+- Claude Code: `/create-pr` スキルを使用する。
 - 人間が対話的に作成する場合は `gh pr create -T .github/pull_request_template.md` を使う。
-- AI エージェントが `--body` または `--body-file` を使う場合は、`--template`（`-T`）を併用してはならない。
-- 非対話（AI）で作成する場合は、テンプレート構成に沿った本文を `--body` / `--body-file` で渡す。
+- その他のエージェント: `.claude/skills/create-pr/SKILL.md` を参照して実行する。
 
 ---
 
