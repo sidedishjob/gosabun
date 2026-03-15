@@ -22,9 +22,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
 
       - name: Create and push tag
         run: |
-          git tag "${{ steps.version.outputs.tag }}"
+          git tag "${{ steps.version.outputs.tag }}" "${{ github.event.pull_request.merge_commit_sha }}"
           git push origin "${{ steps.version.outputs.tag }}"
