@@ -267,6 +267,79 @@ describe("computeDiff", () => {
     })
   })
 
+  describe("EOF newline diffs", () => {
+    it("detects trailing newline addition (a → a\\n)", () => {
+      const result = computeDiff("a", "a\n", "word")
+      expect(result.truncated).toBe(false)
+      const hasInsert = result.rows.some((r) =>
+        r.b.segments.some((s) => s.type === "insert" && s.tokens.some((t) => t.type === "newline"))
+      )
+      expect(hasInsert).toBe(true)
+    })
+
+    it("detects trailing newline removal (a\\n → a)", () => {
+      const result = computeDiff("a\n", "a", "word")
+      const hasDelete = result.rows.some((r) =>
+        r.a.segments.some((s) => s.type === "delete" && s.tokens.some((t) => t.type === "newline"))
+      )
+      expect(hasDelete).toBe(true)
+    })
+
+    it("shows empty-to-newline as insert change ('' → '\\n')", () => {
+      const result = computeDiff("", "\n", "word")
+      expect(result.rows.length).toBeGreaterThan(0)
+      const hasInsert = result.rows.some((r) =>
+        r.b.segments.some((s) => s.type === "insert" && s.tokens.some((t) => t.type === "newline"))
+      )
+      expect(hasInsert).toBe(true)
+    })
+
+    it("shows newline-to-empty as delete change ('\\n' → '')", () => {
+      const result = computeDiff("\n", "", "word")
+      expect(result.rows.length).toBeGreaterThan(0)
+      const hasDelete = result.rows.some((r) =>
+        r.a.segments.some((s) => s.type === "delete" && s.tokens.some((t) => t.type === "newline"))
+      )
+      expect(hasDelete).toBe(true)
+    })
+  })
+
+  describe("empty line diffs", () => {
+    it("detects middle empty line deletion (a\\n\\nb → a\\nb)", () => {
+      const result = computeDiff("a\n\nb", "a\nb", "word")
+      expect(result.truncated).toBe(false)
+      const hasDeleteNewline = result.rows.some(
+        (r) =>
+          r.lineB === undefined &&
+          r.a.segments.some(
+            (s) => s.type === "delete" && s.tokens.some((t) => t.type === "newline")
+          )
+      )
+      expect(hasDeleteNewline).toBe(true)
+    })
+
+    it("does not add false newline delete when replacing empty line with content", () => {
+      // "\n" → "x\n": both sides have newline, only text differs
+      const result = computeDiff("\n", "x\n", "word")
+      const falseNewlineDelete = result.rows.some((r) =>
+        r.a.segments.some((s) => s.type === "delete" && s.tokens.some((t) => t.type === "newline"))
+      )
+      expect(falseNewlineDelete).toBe(false)
+    })
+
+    it("detects middle empty line insertion (a\\nb → a\\n\\nb)", () => {
+      const result = computeDiff("a\nb", "a\n\nb", "word")
+      const hasInsertNewline = result.rows.some(
+        (r) =>
+          r.lineA === undefined &&
+          r.b.segments.some(
+            (s) => s.type === "insert" && s.tokens.some((t) => t.type === "newline")
+          )
+      )
+      expect(hasInsertNewline).toBe(true)
+    })
+  })
+
   describe("ignoreTrimWhitespace", () => {
     it("neutralizes rows that differ only by leading/trailing whitespace", () => {
       const result = computeDiff("  hello  ", "hello", "word", {
