@@ -24,42 +24,40 @@ export function splitText(text: string, mode: WordMode): DiffToken[] {
 
   if (mode === "char") {
     const tokens: DiffToken[] = []
-    let remaining = replaced
-    while (remaining.length > 0) {
-      if (remaining.startsWith(NEWLINE_MARKER)) {
+    const len = replaced.length
+    const markerLen = NEWLINE_MARKER.length
+    let i = 0
+    while (i < len) {
+      if (replaced[i] === "<" && replaced.startsWith(NEWLINE_MARKER, i)) {
         tokens.push({ value: NEWLINE_MARKER, type: "newline" })
-        remaining = remaining.slice(NEWLINE_MARKER.length)
+        i += markerLen
       } else {
-        tokens.push({ value: remaining[0], type: "char" })
-        remaining = remaining.slice(1)
+        tokens.push({ value: replaced[i], type: "char" })
+        i++
       }
     }
     return tokens
   }
 
-  const wordPattern = /^([a-z]+|<\$>|&#?\w+;|[\s\S])/
+  const wordPattern = /[a-z]+|<\$>|&#?\w+;|[\s\S]/gy
 
   const tokens: DiffToken[] = []
-  let remaining = replaced
-
-  while (remaining.length > 0) {
-    const match = wordPattern.exec(remaining)
-    if (!match) break
-    const value = match[1]
+  let match: RegExpExecArray | null
+  while ((match = wordPattern.exec(replaced)) !== null) {
+    const value = match[0]
 
     let type: TokenType
     if (value === NEWLINE_MARKER) {
       type = "newline"
-    } else if (/^&#?\w+;$/.test(value)) {
+    } else if (value.charCodeAt(0) === 38 && value.length > 1) {
       type = "entity"
-    } else if (/^[a-z]+$/.test(value)) {
+    } else if (value.charCodeAt(0) >= 97 && value.charCodeAt(0) <= 122) {
       type = "word"
     } else {
       type = "char"
     }
 
     tokens.push({ value, type })
-    remaining = remaining.slice(value.length)
   }
 
   return tokens
