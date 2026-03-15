@@ -132,6 +132,11 @@ AIエージェントが作業指示を受けた場合、以下の手順で進捗
 - `docs/tasks/contact-form-validation/todo_contact-form-validation.md`
 - `docs/tasks/contact-form-validation/research_contact-form-validation.md`
 
+### コミット対象外
+
+- `docs/tasks/` 配下のファイルは一切 git commit に含めないこと。
+- `git add` の対象にしてはならない。
+
 ### 出力ルール
 
 1. まず Markdown 本文を構成する
