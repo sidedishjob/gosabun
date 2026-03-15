@@ -318,6 +318,15 @@ describe("computeDiff", () => {
       expect(hasDeleteNewline).toBe(true)
     })
 
+    it("does not add false newline delete when replacing empty line with content", () => {
+      // "\n" → "x\n": both sides have newline, only text differs
+      const result = computeDiff("\n", "x\n", "word")
+      const falseNewlineDelete = result.rows.some((r) =>
+        r.a.segments.some((s) => s.type === "delete" && s.tokens.some((t) => t.type === "newline"))
+      )
+      expect(falseNewlineDelete).toBe(false)
+    })
+
     it("detects middle empty line insertion (a\\nb → a\\n\\nb)", () => {
       const result = computeDiff("a\nb", "a\n\nb", "word")
       const hasInsertNewline = result.rows.some(

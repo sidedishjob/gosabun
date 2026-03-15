@@ -312,18 +312,8 @@ function buildRowsFromPairs(pairs: LinePair[], mode: WordMode): DiffRowModel[] {
               const chunks = computeChunks(tokA, tokB)
               const { segmentsA, segmentsB } = chunksToSegments(chunks)
               rows.push({
-                a: {
-                  segments:
-                    tokA.length === 0 && segmentsA.length === 0
-                      ? [newlineSegment("delete")]
-                      : segmentsA,
-                },
-                b: {
-                  segments:
-                    tokB.length === 0 && segmentsB.length === 0
-                      ? [newlineSegment("insert")]
-                      : segmentsB,
-                },
+                a: { segments: segmentsA },
+                b: { segments: segmentsB },
                 lineA,
                 lineB,
               })
