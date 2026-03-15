@@ -19,7 +19,7 @@ function replaceTrailingSpaces(tokens: DiffToken[]): DiffToken[] {
 function renderSegment(segment: DiffSegment, segIndex: number, isHighlightSide: boolean) {
   const isHighlight = isHighlightSide && (segment.type === "delete" || segment.type === "insert")
   const tokens = isHighlight ? replaceTrailingSpaces(segment.tokens) : segment.tokens
-  const text = tokens.map((t) => t.value).join("")
+  const text = tokens.map((t) => (t.type === "newline" ? "↵" : t.value)).join("")
 
   if (isHighlight) {
     return (
@@ -32,7 +32,9 @@ function renderSegment(segment: DiffSegment, segIndex: number, isHighlightSide: 
 }
 
 function getCellText(cell: DiffCellModel): string {
-  return cell.segments.flatMap((s) => s.tokens.map((t) => t.value)).join("")
+  return cell.segments
+    .flatMap((s) => s.tokens.map((t) => (t.type === "newline" ? "\n" : t.value)))
+    .join("")
 }
 
 function CopyButton({ text }: { text: string }) {
