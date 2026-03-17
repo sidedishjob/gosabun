@@ -34,12 +34,8 @@ export default function Home() {
   })
   const [colorMode, setColorMode] = useState<ColorMode>("light")
 
-  const { result, setResult, resultVersion, setResultVersion, handleCompare } = useDiffCompare(
-    textA,
-    textB,
-    wordMode,
-    ignoreOptions
-  )
+  const { result, setResult, resultVersion, setResultVersion, isComparing, handleCompare } =
+    useDiffCompare(textA, textB, wordMode, ignoreOptions)
 
   const diffSnapshot = { result, resultVersion }
 
@@ -92,6 +88,7 @@ export default function Home() {
             onClearA={() => handleClearA(diffSnapshot)}
             onClearB={() => handleClearB(diffSnapshot)}
             onSwap={() => handleSwap(diffSnapshot)}
+            isComparing={isComparing}
             onCompare={handleCompare}
             onClear={() => {
               handleClearAll(diffSnapshot)
