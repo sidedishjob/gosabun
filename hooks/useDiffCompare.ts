@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useRef } from "react"
+import { useState, useCallback, useRef, useEffect } from "react"
 import { computeDiff } from "@/lib/diff-engine"
 import { MAX_TEXT_LENGTH } from "@/lib/constants"
 import type { WordMode, IgnoreOptions, DiffResult } from "@/lib/types"
@@ -21,6 +21,12 @@ export function useDiffCompare(
     textB.length > 0 &&
     textA.length <= MAX_TEXT_LENGTH &&
     textB.length <= MAX_TEXT_LENGTH
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+    }
+  }, [])
 
   const handleCompare = useCallback(() => {
     if (!canCompare) return
