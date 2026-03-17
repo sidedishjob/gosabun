@@ -42,6 +42,7 @@ interface InputPanelProps {
   onSwap: () => void
   onCompare: () => void
   onClear: () => void
+  isComparing: boolean
 }
 
 export function InputPanel({
@@ -54,6 +55,7 @@ export function InputPanel({
   onSwap,
   onCompare,
   onClear,
+  isComparing,
 }: InputPanelProps) {
   const overLimitA = textA.length > MAX_TEXT_LENGTH
   const overLimitB = textB.length > MAX_TEXT_LENGTH
@@ -288,8 +290,8 @@ export function InputPanel({
       <div className="flex justify-center gap-2">
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button onClick={onCompare} disabled={!canCompare} className="px-8">
-              比較する
+            <Button onClick={onCompare} disabled={!canCompare || isComparing} className="px-8">
+              {isComparing ? "比較中..." : "比較する"}
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom">
