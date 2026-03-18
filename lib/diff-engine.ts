@@ -22,12 +22,15 @@ export function splitText(text: string, mode: WordMode): DiffToken[] {
 
   if (mode === "char") {
     const tokens: DiffToken[] = []
-    for (const ch of normalized) {
-      if (ch === "\n") {
+    const len = normalized.length
+    let i = 0
+    while (i < len) {
+      if (normalized[i] === "\n") {
         tokens.push({ value: "\n", type: "newline" })
       } else {
-        tokens.push({ value: ch, type: "char" })
+        tokens.push({ value: normalized[i], type: "char" })
       }
+      i++
     }
     return tokens
   }
