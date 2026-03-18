@@ -91,7 +91,7 @@ export function DiffViewer({ result, displayMode }: DiffViewerProps) {
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+      <div className="sticky top-10 z-5 flex items-center gap-1.5 bg-background py-1 text-xs text-muted-foreground">
         <span className="tabular-nums" aria-live="polite" aria-atomic="true">
           {currentChangeIdx >= 0 ? currentChangeIdx + 1 : "-"} / {changeIndices.length} 件
         </span>

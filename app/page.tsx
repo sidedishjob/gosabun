@@ -34,8 +34,15 @@ export default function Home() {
   })
   const [colorMode, setColorMode] = useState<ColorMode>("light")
 
-  const { result, setResult, resultVersion, setResultVersion, isComparing, handleCompare } =
-    useDiffCompare(textA, textB, wordMode, ignoreOptions)
+  const {
+    result,
+    setResult,
+    resultVersion,
+    setResultVersion,
+    isComparing,
+    handleCompare,
+    optionsChanged,
+  } = useDiffCompare(textA, textB, wordMode, ignoreOptions)
 
   const diffSnapshot = { result, resultVersion }
 
@@ -96,16 +103,26 @@ export default function Home() {
             }}
           />
 
-          <OptionsBar
-            wordMode={wordMode}
-            theme={theme}
-            displayMode={displayMode}
-            ignoreOptions={ignoreOptions}
-            onWordModeChange={setWordMode}
-            onThemeChange={handleThemeChange}
-            onDisplayModeChange={setDisplayMode}
-            onIgnoreOptionsChange={setIgnoreOptions}
-          />
+          <div className="sticky top-0 z-10 flex flex-wrap items-center gap-x-4 gap-y-2 bg-background pt-2 pb-2">
+            <OptionsBar
+              wordMode={wordMode}
+              theme={theme}
+              displayMode={displayMode}
+              ignoreOptions={ignoreOptions}
+              onWordModeChange={setWordMode}
+              onThemeChange={handleThemeChange}
+              onDisplayModeChange={setDisplayMode}
+              onIgnoreOptionsChange={setIgnoreOptions}
+            />
+            {optionsChanged && (
+              <span className="text-xs text-muted-foreground animate-in fade-in duration-200">
+                <kbd className="mr-1 rounded border bg-muted px-1 py-0.5 font-mono text-[10px]">
+                  ⌘+Enter
+                </kbd>
+                で再比較
+              </span>
+            )}
+          </div>
 
           {result && (
             <ErrorBoundary>
