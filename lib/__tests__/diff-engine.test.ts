@@ -18,7 +18,7 @@ describe("splitText", () => {
       const tokens = splitText("a\nb", "word")
       expect(tokens).toEqual([
         { value: "a", type: "word" },
-        { value: "<$>", type: "newline" },
+        { value: "\n", type: "newline" },
         { value: "b", type: "word" },
       ])
     })
@@ -27,7 +27,7 @@ describe("splitText", () => {
       const tokens = splitText("a\r\nb", "word")
       expect(tokens).toEqual([
         { value: "a", type: "word" },
-        { value: "<$>", type: "newline" },
+        { value: "\n", type: "newline" },
         { value: "b", type: "word" },
       ])
     })
@@ -36,7 +36,7 @@ describe("splitText", () => {
       const tokens = splitText("a\rb", "word")
       expect(tokens).toEqual([
         { value: "a", type: "word" },
-        { value: "<$>", type: "newline" },
+        { value: "\n", type: "newline" },
         { value: "b", type: "word" },
       ])
     })
@@ -62,6 +62,16 @@ describe("splitText", () => {
     it("returns empty array for empty string", () => {
       expect(splitText("", "word")).toEqual([])
     })
+
+    it("treats <$> in input as regular characters, not as newline", () => {
+      const tokens = splitText("<$>", "word")
+      expect(tokens).toEqual([
+        { value: "<", type: "char" },
+        { value: "$", type: "char" },
+        { value: ">", type: "char" },
+      ])
+      expect(tokens.every((t) => t.type !== "newline")).toBe(true)
+    })
   })
 
   describe("char mode", () => {
@@ -77,7 +87,7 @@ describe("splitText", () => {
       const tokens = splitText("a\nb", "char")
       expect(tokens).toEqual([
         { value: "a", type: "char" },
-        { value: "<$>", type: "newline" },
+        { value: "\n", type: "newline" },
         { value: "b", type: "char" },
       ])
     })
@@ -86,7 +96,7 @@ describe("splitText", () => {
       const tokens = splitText("a\r\nb", "char")
       expect(tokens).toEqual([
         { value: "a", type: "char" },
-        { value: "<$>", type: "newline" },
+        { value: "\n", type: "newline" },
         { value: "b", type: "char" },
       ])
     })
@@ -98,6 +108,16 @@ describe("splitText", () => {
     it("treats spaces as char tokens", () => {
       const tokens = splitText(" ", "char")
       expect(tokens).toEqual([{ value: " ", type: "char" }])
+    })
+
+    it("treats <$> in input as regular characters, not as newline", () => {
+      const tokens = splitText("<$>", "char")
+      expect(tokens).toEqual([
+        { value: "<", type: "char" },
+        { value: "$", type: "char" },
+        { value: ">", type: "char" },
+      ])
+      expect(tokens.every((t) => t.type !== "newline")).toBe(true)
     })
   })
 })
