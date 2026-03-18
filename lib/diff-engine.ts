@@ -11,7 +11,6 @@ import type {
   IgnoreOptions,
 } from "./types"
 import { MAX_TEXT_LENGTH } from "./constants"
-const NEWLINE_MARKER = "<$>"
 
 interface LogicalLine {
   text: string
@@ -20,34 +19,28 @@ interface LogicalLine {
 
 export function splitText(text: string, mode: WordMode): DiffToken[] {
   const normalized = text.replace(/\r\n?/g, "\n")
-  const replaced = normalized.replaceAll("\n", NEWLINE_MARKER)
 
   if (mode === "char") {
     const tokens: DiffToken[] = []
-    const len = replaced.length
-    const markerLen = NEWLINE_MARKER.length
-    let i = 0
-    while (i < len) {
-      if (replaced[i] === "<" && replaced.startsWith(NEWLINE_MARKER, i)) {
-        tokens.push({ value: NEWLINE_MARKER, type: "newline" })
-        i += markerLen
+    for (const ch of normalized) {
+      if (ch === "\n") {
+        tokens.push({ value: "\n", type: "newline" })
       } else {
-        tokens.push({ value: replaced[i], type: "char" })
-        i++
+        tokens.push({ value: ch, type: "char" })
       }
     }
     return tokens
   }
 
-  const wordPattern = /[a-z]+|<\$>|&#?\w+;|[\s\S]/gy
+  const wordPattern = /[a-z]+|\n|&#?\w+;|[\s\S]/gy
 
   const tokens: DiffToken[] = []
   let match: RegExpExecArray | null
-  while ((match = wordPattern.exec(replaced)) !== null) {
+  while ((match = wordPattern.exec(normalized)) !== null) {
     const value = match[0]
 
     let type: TokenType
-    if (value === NEWLINE_MARKER) {
+    if (value === "\n") {
       type = "newline"
     } else if (value.charCodeAt(0) === 38 && value.length > 1) {
       type = "entity"
@@ -225,7 +218,7 @@ function chunksToSegments(chunks: DiffChunk[]): {
 }
 
 function newlineSegment(type: "delete" | "insert"): DiffSegment {
-  return { tokens: [{ value: NEWLINE_MARKER, type: "newline" }], type }
+  return { tokens: [{ value: "\n", type: "newline" }], type }
 }
 
 function buildRowsFromPairs(pairs: LinePair[], mode: WordMode): DiffRowModel[] {
@@ -351,7 +344,7 @@ function buildRowsFromPairs(pairs: LinePair[], mode: WordMode): DiffRowModel[] {
 function segmentsToText(segments: DiffSegment[]): string {
   return segments
     .flatMap((s) => s.tokens)
-    .map((t) => (t.value === NEWLINE_MARKER ? "\n" : t.value))
+    .map((t) => (t.type === "newline" ? "\n" : t.value))
     .join("")
 }
 
