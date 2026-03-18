@@ -65,5 +65,7 @@ export function useDiffCompare(
     canCompare,
     handleCompare,
     optionsChanged,
+    lastComparedOptions,
+    setLastComparedOptions,
   }
 }

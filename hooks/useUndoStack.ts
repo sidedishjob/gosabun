@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import type { DiffResult } from "@/lib/types"
+import type { DiffResult, WordMode, IgnoreOptions } from "@/lib/types"
 import { UNDO_MAX_DEPTH } from "@/lib/constants"
 
 export interface UndoState {
@@ -9,6 +9,7 @@ export interface UndoState {
   textB: string
   result: DiffResult | null
   resultVersion: number
+  lastComparedOptions: { wordMode: WordMode; ignoreOptions: IgnoreOptions } | null
 }
 
 export function useUndoStack() {

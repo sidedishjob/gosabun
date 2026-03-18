@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react"
 import { useUndoStack, type UndoState } from "@/hooks/useUndoStack"
-import type { DiffResult } from "@/lib/types"
+import type { DiffResult, WordMode, IgnoreOptions } from "@/lib/types"
 
 const SAMPLE_A = `探偵の田中は、深夜12時に依頼人から電話を受けた。
 「ダイヤモンドが消えた」と声は震えていた。
@@ -30,6 +30,7 @@ The quick brown cat jumps over the lazy　dog.
 interface DiffSnapshot {
   result: DiffResult | null
   resultVersion: number
+  lastComparedOptions: { wordMode: WordMode; ignoreOptions: IgnoreOptions } | null
 }
 
 export function useTextInput() {
