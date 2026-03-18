@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useRef, useEffect } from "react"
 import { Moon, Sun } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { InputPanel } from "@/components/InputPanel"
@@ -34,17 +34,27 @@ export default function Home() {
   })
   const [colorMode, setColorMode] = useState<ColorMode>("light")
 
-  const { result, setResult, resultVersion, setResultVersion, isComparing, handleCompare } =
-    useDiffCompare(textA, textB, wordMode, ignoreOptions)
+  const {
+    result,
+    setResult,
+    resultVersion,
+    setResultVersion,
+    isComparing,
+    handleCompare,
+    optionsChanged,
+    lastComparedOptions,
+    setLastComparedOptions,
+  } = useDiffCompare(textA, textB, wordMode, ignoreOptions)
 
-  const diffSnapshot = { result, resultVersion }
+  const diffSnapshot = { result, resultVersion, lastComparedOptions }
 
   const handleUndo = useCallback(() => {
     const state = restoreFromUndo()
     if (!state) return
     setResult(state.result)
     setResultVersion(state.resultVersion)
-  }, [restoreFromUndo, setResult, setResultVersion])
+    setLastComparedOptions(state.lastComparedOptions)
+  }, [restoreFromUndo, setResult, setResultVersion, setLastComparedOptions])
 
   useKeyboardShortcuts({
     onCompare: handleCompare,
@@ -59,6 +69,18 @@ export default function Home() {
   const handleThemeChange = useCallback((t: Theme) => {
     setTheme(t)
     document.documentElement.setAttribute("data-theme", t)
+  }, [])
+
+  // OptionsBar ラッパーの高さを計測し CSS 変数に反映
+  const optionsBarRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = optionsBarRef.current
+    if (!el) return
+    const observer = new ResizeObserver(() => {
+      document.documentElement.style.setProperty("--sticky-bar-height", `${el.offsetHeight}px`)
+    })
+    observer.observe(el)
+    return () => observer.disconnect()
   }, [])
 
   return (
@@ -96,16 +118,29 @@ export default function Home() {
             }}
           />
 
-          <OptionsBar
-            wordMode={wordMode}
-            theme={theme}
-            displayMode={displayMode}
-            ignoreOptions={ignoreOptions}
-            onWordModeChange={setWordMode}
-            onThemeChange={handleThemeChange}
-            onDisplayModeChange={setDisplayMode}
-            onIgnoreOptionsChange={setIgnoreOptions}
-          />
+          <div
+            ref={optionsBarRef}
+            className="sticky top-0 z-10 flex flex-wrap items-center gap-x-4 gap-y-2 bg-background pt-2 pb-2"
+          >
+            <OptionsBar
+              wordMode={wordMode}
+              theme={theme}
+              displayMode={displayMode}
+              ignoreOptions={ignoreOptions}
+              onWordModeChange={setWordMode}
+              onThemeChange={handleThemeChange}
+              onDisplayModeChange={setDisplayMode}
+              onIgnoreOptionsChange={setIgnoreOptions}
+            />
+            {optionsChanged && (
+              <span className="text-xs text-muted-foreground animate-in fade-in duration-200">
+                <kbd className="mr-1 rounded border bg-muted px-1 py-0.5 font-mono text-[10px]">
+                  ⌘+Enter
+                </kbd>
+                で再比較
+              </span>
+            )}
+          </div>
 
           {result && (
             <ErrorBoundary>

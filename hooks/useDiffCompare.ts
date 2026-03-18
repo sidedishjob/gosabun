@@ -16,6 +16,12 @@ export function useDiffCompare(
   const [isComparing, setIsComparing] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  // 比較時のオプションを記録し、変更検知に使う
+  const [lastComparedOptions, setLastComparedOptions] = useState<{
+    wordMode: WordMode
+    ignoreOptions: IgnoreOptions
+  } | null>(null)
+
   const canCompare =
     textA.length > 0 &&
     textB.length > 0 &&
@@ -32,6 +38,7 @@ export function useDiffCompare(
     if (!canCompare) return
     if (timerRef.current) clearTimeout(timerRef.current)
 
+    setLastComparedOptions({ wordMode, ignoreOptions })
     setIsComparing(true)
     // ブラウザに描画を譲ってからスピナーを表示し、その後に同期実行
     timerRef.current = setTimeout(() => {
@@ -43,6 +50,12 @@ export function useDiffCompare(
     }, 0)
   }, [textA, textB, wordMode, ignoreOptions, canCompare])
 
+  const optionsChanged =
+    result !== null &&
+    lastComparedOptions !== null &&
+    (lastComparedOptions.wordMode !== wordMode ||
+      lastComparedOptions.ignoreOptions.ignoreTrimWhitespace !== ignoreOptions.ignoreTrimWhitespace)
+
   return {
     result,
     setResult,
@@ -51,5 +64,8 @@ export function useDiffCompare(
     isComparing,
     canCompare,
     handleCompare,
+    optionsChanged,
+    lastComparedOptions,
+    setLastComparedOptions,
   }
 }
