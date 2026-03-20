@@ -1,3 +1,8 @@
+/**
+ * 差分結果をサイドバイサイドで表示するコンポーネント。
+ * 変更箇所間の前後ナビゲーション（循環）と表示モード切り替えを提供する。
+ */
+
 "use client"
 
 import { useState, useMemo, useCallback, useRef } from "react"
@@ -6,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import type { DiffResult, DiffRowModel, DiffDisplayMode } from "@/lib/types"
 import { DiffRow } from "./DiffRow"
 
+/** 行に差分（delete / insert）が含まれるかを判定する */
 function hasChange(row: DiffRowModel): boolean {
   return (
     row.a.segments.some((s) => s.type === "delete" || s.type === "insert") ||
@@ -22,6 +28,8 @@ export function DiffViewer({ result, displayMode }: DiffViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [currentChangeIdx, setCurrentChangeIdx] = useState(-1)
 
+  // displayMode に応じて全行 or 差分行のみにフィルタする。
+  // originalIndex は DiffRow の key とスクロールターゲットに使用する。
   const displayRows = useMemo(
     () =>
       displayMode === "diff-only"
@@ -32,12 +40,14 @@ export function DiffViewer({ result, displayMode }: DiffViewerProps) {
     [result.rows, displayMode]
   )
 
+  // displayRows 内で変更がある行のインデックス一覧（ナビゲーション用）
   const changeIndices = useMemo(
     () =>
       displayRows.reduce<number[]>((acc, { row }, i) => (hasChange(row) ? [...acc, i] : acc), []),
     [displayRows]
   )
 
+  /** 指定した変更箇所インデックスの行までスクロールする */
   const scrollToRow = useCallback(
     (changeIdx: number) => {
       if (!containerRef.current || changeIdx < 0 || changeIdx >= changeIndices.length) return
@@ -57,6 +67,7 @@ export function DiffViewer({ result, displayMode }: DiffViewerProps) {
     [changeIndices, displayRows]
   )
 
+  // 循環ナビゲーション: 先頭で「前へ」→ 末尾、末尾で「次へ」→ 先頭
   const handlePrev = useCallback(() => {
     if (changeIndices.length === 0) return
     const next = currentChangeIdx <= 0 ? changeIndices.length - 1 : currentChangeIdx - 1

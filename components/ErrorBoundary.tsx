@@ -1,3 +1,7 @@
+/**
+ * 差分表示領域のランタイムエラーをキャッチして回復 UI を表示するエラーバウンダリ。
+ */
+
 "use client"
 
 import { Component } from "react"

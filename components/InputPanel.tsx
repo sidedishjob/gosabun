@@ -1,3 +1,9 @@
+/**
+ * テキスト入力パネル。
+ * 左右 2 つの textarea でテキスト入力を受け付け、
+ * ファイルドラッグ＆ドロップとファイル選択ダイアログにも対応する。
+ */
+
 "use client"
 
 import { useCallback, useRef, useState } from "react"
@@ -7,7 +13,9 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip
 import { ArrowLeftRight, Upload, X } from "lucide-react"
 import { MAX_TEXT_LENGTH } from "@/lib/constants"
 
+/** 受け付けるファイル拡張子 */
 const ACCEPTED_EXTENSIONS = [".txt", ".md", ".csv", ".json", ".xml", ".html"]
+/** input[type=file] の accept 属性用（拡張子 + MIME タイプ） */
 const ACCEPTED_MIME_TYPES = [
   ...ACCEPTED_EXTENSIONS,
   "text/plain",
@@ -18,6 +26,7 @@ const ACCEPTED_MIME_TYPES = [
   "text/html",
 ].join(",")
 
+/** 拡張子バリデーション付きの FileReader ラッパー */
 function readFileAsText(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const hasValidExt = ACCEPTED_EXTENSIONS.some((ext) => file.name.toLowerCase().endsWith(ext))
@@ -67,6 +76,8 @@ export function InputPanel({
   const [fileErrorB, setFileErrorB] = useState<string | null>(null)
   const fileInputARef = useRef<HTMLInputElement>(null)
   const fileInputBRef = useRef<HTMLInputElement>(null)
+  // ドラッグカウンター: 子要素の enter/leave イベントバブリングで
+  // dragOver 状態が誤解除されるのを防ぐ
   const dragCounterA = useRef(0)
   const dragCounterB = useRef(0)
 
