@@ -1,3 +1,10 @@
+/**
+ * gosabun のメインページ。
+ * テキスト入力・比較オプション・差分表示・統計の全体を統合する。
+ * 各機能はカスタムフック（useTextInput / useDiffCompare / useKeyboardShortcuts）に
+ * 委譲し、このコンポーネントは状態のオーケストレーションとレイアウトを担う。
+ */
+
 "use client"
 
 import { useState, useCallback, useRef, useEffect } from "react"
@@ -46,8 +53,10 @@ export default function Home() {
     setLastComparedOptions,
   } = useDiffCompare(textA, textB, wordMode, ignoreOptions)
 
+  // Undo 用に現在の差分状態をキャプチャする
   const diffSnapshot = { result, resultVersion, lastComparedOptions }
 
+  /** Undo スタックからテキストと差分結果を復元する */
   const handleUndo = useCallback(() => {
     const state = restoreFromUndo()
     if (!state) return
@@ -61,11 +70,13 @@ export default function Home() {
     onUndo: handleUndo,
   })
 
+  /** Tailwind CSS のダークモードクラスを document に切り替える */
   const handleColorModeChange = useCallback((mode: ColorMode) => {
     setColorMode(mode)
     document.documentElement.classList.toggle("dark", mode === "dark")
   }, [])
 
+  /** data-theme 属性で差分ハイライトの配色を切り替える */
   const handleThemeChange = useCallback((t: Theme) => {
     setTheme(t)
     document.documentElement.setAttribute("data-theme", t)

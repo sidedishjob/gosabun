@@ -1,3 +1,9 @@
+/**
+ * 差分比較の実行を管理するフック。
+ * setTimeout(…, 0) で比較をメインスレッドの描画フレーム後に
+ * 遅延実行し、スピナー表示中の UI ブロッキングを回避する。
+ */
+
 "use client"
 
 import { useState, useCallback, useRef, useEffect } from "react"
@@ -5,6 +11,10 @@ import { computeDiff } from "@/lib/diff-engine"
 import { MAX_TEXT_LENGTH } from "@/lib/constants"
 import type { WordMode, IgnoreOptions, DiffResult } from "@/lib/types"
 
+/**
+ * テキスト差分比較の状態と実行ロジックを提供する。
+ * @returns result / isComparing / optionsChanged など比較関連の状態一式
+ */
 export function useDiffCompare(
   textA: string,
   textB: string,
@@ -50,6 +60,7 @@ export function useDiffCompare(
     }, 0)
   }, [textA, textB, wordMode, ignoreOptions, canCompare])
 
+  // オプション変更後に再比較を促すためのフラグ
   const optionsChanged =
     result !== null &&
     lastComparedOptions !== null &&

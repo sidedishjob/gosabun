@@ -1,3 +1,16 @@
+/**
+ * テキスト差分比較エンジン。
+ * 2つのテキストを行単位で差分検出し、変更行にはさらに
+ * トークン単位のインライン差分を適用して比較結果を生成する。
+ *
+ * パイプライン:
+ *   テキスト → 行ペア (computeLinePairs)
+ *     → 行モデル (buildRowsFromPairs)
+ *       → replace 行ではインライン差分 (computeChunks → chunksToSegments)
+ *     → 無視オプション適用 (applyIgnoreOptions)
+ *     → DiffResult
+ */
+
 import { diffArrays, diffLines } from "diff"
 import type {
   DiffToken,
@@ -12,11 +25,17 @@ import type {
 } from "./types"
 import { MAX_TEXT_LENGTH } from "./constants"
 
+/** 論理行。テキスト本体と末尾に改行があるかを保持する */
 interface LogicalLine {
   text: string
   hasNewline: boolean
 }
 
+/**
+ * テキストをモードに応じてトークン列に分割する。
+ * @param text 対象テキスト
+ * @param mode "word" = 英単語/1文字単位、"char" = 全て1文字単位
+ */
 export function splitText(text: string, mode: WordMode): DiffToken[] {
   const normalized = text.replace(/\r\n?/g, "\n")
 
@@ -35,6 +54,10 @@ export function splitText(text: string, mode: WordMode): DiffToken[] {
     return tokens
   }
 
+  // [a-z]+   : 英小文字の連続（単語）
+  // \n       : 改行
+  // &#?\w+;  : HTML 実体参照（&amp; &#123; など）
+  // [\s\S]   : 上記以外の任意の 1 文字（日本語・記号・空白など）
   const wordPattern = /[a-z]+|\n|&#?\w+;|[\s\S]/gy
 
   const tokens: DiffToken[] = []
@@ -59,6 +82,7 @@ export function splitText(text: string, mode: WordMode): DiffToken[] {
   return tokens
 }
 
+/** テキストの文字数・空白数・改行数・語数を集計する */
 export function countStats(text: string): DiffStats {
   const normalized = text.replace(/\r\n?/g, "\n")
   const charWithNewline = normalized.length
@@ -71,10 +95,16 @@ export function countStats(text: string): DiffStats {
   return { charCount, charWithSpace, charWithNewline, wordCount }
 }
 
+/**
+ * トークンを diffArrays に渡すための文字列キーに変換する。
+ * type と value を NULL 文字で結合し、同じ value でも type が
+ * 異なれば別キーとして扱えるようにしている。
+ */
 function tokenToKey(token: DiffToken): string {
   return `${token.type}\u0000${token.value}`
 }
 
+/** 文字列キーを DiffToken に復元する */
 function keyToToken(key: string): DiffToken {
   const idx = key.indexOf("\u0000")
   if (idx === -1) {
@@ -86,6 +116,10 @@ function keyToToken(key: string): DiffToken {
   }
 }
 
+/**
+ * 2つのトークン列をトークン単位で比較し、チャンク列を返す。
+ * 連続する delete + insert は replace にマージする。
+ */
 function computeChunks(tokensA: DiffToken[], tokensB: DiffToken[]): DiffChunk[] {
   const keysA = tokensA.map(tokenToKey)
   const keysB = tokensB.map(tokenToKey)
@@ -128,12 +162,18 @@ function computeChunks(tokensA: DiffToken[], tokensB: DiffToken[]): DiffChunk[] 
 }
 
 type LinePairType = "equal" | "delete" | "insert" | "replace"
+/** 行単位の差分ペア。左右それぞれの論理行を保持する */
 interface LinePair {
   type: LinePairType
   linesA: LogicalLine[]
   linesB: LogicalLine[]
 }
 
+/**
+ * 2つのテキストを行単位で比較し、LinePair 列を返す。
+ * 連続する removed + added は replace にマージする。
+ * 各行は末尾改行の有無を保持し、EOF 差分の検出に使用する。
+ */
 function computeLinePairs(textA: string, textB: string): LinePair[] {
   const normalizedA = textA.replace(/\r\n?/g, "\n")
   const normalizedB = textB.replace(/\r\n?/g, "\n")
@@ -180,6 +220,10 @@ function computeLinePairs(textA: string, textB: string): LinePair[] {
   }))
 }
 
+/**
+ * チャンク列を左右それぞれの DiffSegment 列に変換する。
+ * replace チャンクは左を delete、右を insert として分解する。
+ */
 function chunksToSegments(chunks: DiffChunk[]): {
   segmentsA: DiffSegment[]
   segmentsB: DiffSegment[]
@@ -220,10 +264,17 @@ function chunksToSegments(chunks: DiffChunk[]): {
   return { segmentsA, segmentsB }
 }
 
+/** 改行のみで構成される差分セグメントを生成する */
 function newlineSegment(type: "delete" | "insert"): DiffSegment {
   return { tokens: [{ value: "\n", type: "newline" }], type }
 }
 
+/**
+ * LinePair 列を DiffRowModel 列に変換する。
+ * replace ペアでは左右の行数が異なる場合があり、
+ * 長い方に合わせて不足側を空行として出力する。
+ * テキスト一致で末尾改行のみ異なる場合は EOF 差分として処理する。
+ */
 function buildRowsFromPairs(pairs: LinePair[], mode: WordMode): DiffRowModel[] {
   const rows: DiffRowModel[] = []
   let lineA = 0
@@ -344,6 +395,7 @@ function buildRowsFromPairs(pairs: LinePair[], mode: WordMode): DiffRowModel[] {
   return rows
 }
 
+/** セグメント列をプレーンテキストに復元する（無視オプション判定用） */
 function segmentsToText(segments: DiffSegment[]): string {
   return segments
     .flatMap((s) => s.tokens)
@@ -351,6 +403,7 @@ function segmentsToText(segments: DiffSegment[]): string {
     .join("")
 }
 
+/** 行の全セグメントを equal に書き換え、差分を「なかったこと」にする */
 function neutralizeRow(row: DiffRowModel): DiffRowModel {
   return {
     ...row,
@@ -363,6 +416,10 @@ function neutralizeRow(row: DiffRowModel): DiffRowModel {
   }
 }
 
+/**
+ * 無視オプションを適用する。
+ * trim 後にテキストが一致する行は差分を neutralize して equal 扱いにする。
+ */
 function applyIgnoreOptions(rows: DiffRowModel[], options: IgnoreOptions): DiffRowModel[] {
   return rows.map((row) => {
     const hasDiff =
@@ -380,6 +437,11 @@ function applyIgnoreOptions(rows: DiffRowModel[], options: IgnoreOptions): DiffR
   })
 }
 
+/**
+ * 差分比較の公開 API。
+ * テキスト長チェック → 行ペア計算 → 行内インライン差分 →
+ * 無視オプション適用の順で処理し、DiffResult を返す。
+ */
 export function computeDiff(
   textA: string,
   textB: string,

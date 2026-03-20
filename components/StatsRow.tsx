@@ -1,3 +1,7 @@
+/**
+ * テキストの文字数・空白数・改行数・語数を表示する統計行コンポーネント。
+ */
+
 "use client"
 
 import type { DiffStats } from "@/lib/types"
@@ -8,7 +12,9 @@ interface StatsRowProps {
 }
 
 export function StatsRow({ label, stats }: StatsRowProps) {
+  // charWithSpace（改行除く全文字）- charCount（空白除く文字）= 空白数
   const spaceCount = stats.charWithSpace - stats.charCount
+  // charWithNewline（全文字）- charWithSpace（改行除く）= 改行数
   const newlineCount = stats.charWithNewline - stats.charWithSpace
 
   return (

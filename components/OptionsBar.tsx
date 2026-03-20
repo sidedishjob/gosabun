@@ -1,3 +1,7 @@
+/**
+ * 比較オプション（単語/文字モード、配色、表示モード、空白無視）の切り替え UI。
+ */
+
 "use client"
 
 import { CircleHelp } from "lucide-react"
@@ -10,6 +14,10 @@ import {
   type SegmentOption,
 } from "@/lib/constants"
 
+/**
+ * 汎用セグメントコントロール。
+ * ジェネリック型 T で任意の string リテラル型に対応する。
+ */
 function SegmentedControl<T extends string>({
   options,
   value,

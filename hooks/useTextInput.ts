@@ -1,9 +1,15 @@
+/**
+ * テキスト A/B の入力状態と操作（入れ替え・クリア）を管理するフック。
+ * Undo スタックと統合し、操作前の状態を自動保存する。
+ */
+
 "use client"
 
 import { useState, useCallback } from "react"
 import { useUndoStack, type UndoState } from "@/hooks/useUndoStack"
 import type { DiffResult, WordMode, IgnoreOptions } from "@/lib/types"
 
+/** 初期表示用サンプルテキスト A */
 const SAMPLE_A = `探偵の田中は、深夜12時に依頼人から電話を受けた。
 「ダイヤモンドが消えた」と声は震えていた。
 現場はNewYorkの高級ホテル、MacDonald Suiteの305号室。
@@ -15,6 +21,7 @@ The quick brown fox jumps over the lazy dog.
 容疑者リスト: 3名
 この行はオリジナルにのみ存在する。`
 
+/** 初期表示用サンプルテキスト B */
 const SAMPLE_B = `探偵の鈴木は、深夜12時に依頼人から電話を受けた。
 「エメラルドが消えた」と声は震えていた。
 現場はNewJerseyの高級ホテル、MacArthur Suiteの305号室。
@@ -27,6 +34,10 @@ The quick brown cat jumps over the lazy　dog.
 容疑者リスト： 5名
 この行は改訂版にのみ存在する。`
 
+/**
+ * Undo 復元時に差分結果も巻き戻すために保持するスナップショット。
+ * 各操作ハンドラが呼び出し側から受け取り、Undo スタックに一緒に積む。
+ */
 interface DiffSnapshot {
   result: DiffResult | null
   resultVersion: number

@@ -1,9 +1,18 @@
+/**
+ * 差分の 1 行分を左右ペアで描画するコンポーネント。
+ * セグメント種別に応じたハイライト表示と行コピー機能を持つ。
+ */
+
 "use client"
 
 import { useState, useCallback } from "react"
 import { Copy, Check } from "lucide-react"
 import type { DiffCellModel, DiffSegment, DiffToken } from "@/lib/types"
 
+/**
+ * 末尾の連続スペースを NBSP（\u00A0）に置換する。
+ * HTML が末尾スペースを潰すのを防ぎ、ハイライト範囲を正しく表示する。
+ */
 function replaceTrailingSpaces(tokens: DiffToken[]): DiffToken[] {
   const result = [...tokens]
   for (let i = result.length - 1; i >= 0; i--) {
@@ -16,6 +25,7 @@ function replaceTrailingSpaces(tokens: DiffToken[]): DiffToken[] {
   return result
 }
 
+/** セグメントを描画する。ハイライト対象なら diff-highlight クラスを付与する */
 function renderSegment(segment: DiffSegment, segIndex: number, isHighlightSide: boolean) {
   const isHighlight = isHighlightSide && (segment.type === "delete" || segment.type === "insert")
   const tokens = isHighlight ? replaceTrailingSpaces(segment.tokens) : segment.tokens
@@ -31,12 +41,14 @@ function renderSegment(segment: DiffSegment, segIndex: number, isHighlightSide: 
   return <span key={segIndex}>{text}</span>
 }
 
+/** セルの全トークンからコピー用プレーンテキストを構築する */
 function getCellText(cell: DiffCellModel): string {
   return cell.segments
     .flatMap((s) => s.tokens.map((t) => (t.type === "newline" ? "\n" : t.value)))
     .join("")
 }
 
+/** クリップボードコピーボタン。コピー成功後 1.5 秒間チェックアイコンを表示する */
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
 
@@ -64,6 +76,7 @@ function CopyButton({ text }: { text: string }) {
   )
 }
 
+/** セルの全セグメントを描画する。side に応じてハイライト対象を決定する */
 function renderCell(cell: DiffCellModel, side: "a" | "b") {
   return cell.segments.map((seg, i) => {
     const shouldHighlight =
