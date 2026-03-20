@@ -14,7 +14,7 @@
 
 2つのテキストの違いを確認したいだけなのに、ツールをインストールしたり、テキストを外部サーバーに送信したり、英語圏向けの diff ツールで日本語が正しく比較されなかったりする。
 
-gosabun はシンプルな UI をベースに、**クライアント完結**・**日本語対応**・**カスタマイズ可能**なテキスト差分比較ツールを提供します。
+gosabun はシンプルな UI で、**日本語対応**・**カスタマイズ可能**なテキスト差分比較ツールを提供します。
 
 ---
 
@@ -90,6 +90,9 @@ npm run dev
 
 ## カスタマイズ
 
+<details>
+<summary><b>比較モード・カラーテーマ・その他オプション</b></summary>
+
 ### 比較モード
 
 | モード | 説明                               |
@@ -111,6 +114,8 @@ npm run dev
 - **空白無視**: 行頭・行末の空白を無視して比較
 - **ダークモード**: 画面右のトグルで切替
 
+</details>
+
 ---
 
 ## 技術スタック
@@ -124,8 +129,6 @@ npm run dev
 | Diff エンジン     | jsdiff (diff v8)        |
 | アイコン          | Lucide React            |
 | フォント          | Geist Sans / Geist Mono |
-
-すべての差分処理はクライアントサイドで実行されます。サーバーサイドの API は使用していません。
 
 ---
 
@@ -144,6 +147,9 @@ npm run format:check # フォーマットチェック
 
 ## Cloudflare Pages への CI/CD
 
+<details>
+<summary><b>CI/CD 構成の詳細</b></summary>
+
 本リポジトリでは、CI は GitHub Actions、CD は Cloudflare Pages の Git 連携で運用します。
 
 - CI（`.github/workflows/ci.yml`）
@@ -157,6 +163,8 @@ npm run format:check # フォーマットチェック
 - Cloudflare Pages で GitHub リポジトリを連携
 - Production branch を `main` に設定
 - GitHub 側で `main` を保護（PR 必須 / 必要な CI チェック必須）すると、PR マージ経由のみ本番反映にできます
+
+</details>
 
 ---
 
