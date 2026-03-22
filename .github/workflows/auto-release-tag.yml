@@ -7,7 +7,9 @@ on:
 
 jobs:
   release:
-    if: "${{ github.event.pull_request.merged == true && startsWith(github.event.pull_request.title, 'release: v') }}"
+    if: >-
+      github.event.pull_request.merged == true &&
+      startsWith(github.event.pull_request.title, 'release: v')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -25,9 +27,16 @@ jobs:
           ref: ${{ github.event.pull_request.merge_commit_sha }}
 
       - name: Create and push tag
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+          SHA: ${{ github.event.pull_request.merge_commit_sha }}
         run: |
-          git tag "${{ steps.version.outputs.tag }}" "${{ github.event.pull_request.merge_commit_sha }}"
-          git push origin "${{ steps.version.outputs.tag }}"
+          if git ls-remote --tags origin | grep -q "refs/tags/${TAG}$"; then
+            echo "Tag ${TAG} already exists, skipping"
+          else
+            git tag "${TAG}" "${SHA}"
+            git push origin "${TAG}"
+          fi
 
       - name: Create GitHub Release
         env:
