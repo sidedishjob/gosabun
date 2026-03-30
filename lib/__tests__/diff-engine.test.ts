@@ -452,6 +452,16 @@ describe("computeDiff", () => {
       }
     })
 
+    it("does not neutralize internal whitespace diff between words", () => {
+      const result = computeDiff("a b", "a  b", "word", {
+        ignoreTrimWhitespace: true,
+      })
+      const hasDiff =
+        result.rows.some((r) => r.a.segments.some((s) => s.type !== "equal")) ||
+        result.rows.some((r) => r.b.segments.some((s) => s.type !== "equal"))
+      expect(hasDiff).toBe(true)
+    })
+
     it("does not change behavior when there is no edge whitespace", () => {
       const result = computeDiff("hello world", "hello universe", "word", {
         ignoreTrimWhitespace: true,

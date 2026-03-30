@@ -425,19 +425,15 @@ function isWhitespaceOnlySegment(segment: DiffSegment): boolean {
 function neutralizeEdgeWhitespace(segments: DiffSegment[]): DiffSegment[] {
   const result = segments.map((s) => ({ ...s }))
   for (let i = 0; i < result.length; i++) {
-    if (result[i].type === "equal") continue
-    if (isWhitespaceOnlySegment(result[i])) {
+    if (!isWhitespaceOnlySegment(result[i])) break
+    if (result[i].type !== "equal") {
       result[i] = { ...result[i], type: "equal" }
-    } else {
-      break
     }
   }
   for (let i = result.length - 1; i >= 0; i--) {
-    if (result[i].type === "equal") continue
-    if (isWhitespaceOnlySegment(result[i])) {
+    if (!isWhitespaceOnlySegment(result[i])) break
+    if (result[i].type !== "equal") {
       result[i] = { ...result[i], type: "equal" }
-    } else {
-      break
     }
   }
   return result
