@@ -416,9 +416,37 @@ function neutralizeRow(row: DiffRowModel): DiffRowModel {
   }
 }
 
+/** セグメントの全トークンが空白文字のみで構成されているか判定する */
+function isWhitespaceOnlySegment(segment: DiffSegment): boolean {
+  return segment.tokens.every((t) => t.type === "newline" || /^\s*$/.test(t.value))
+}
+
+/** 先頭・末尾の空白のみ diff セグメントを equal に書き換える（部分 neutralize） */
+function neutralizeEdgeWhitespace(segments: DiffSegment[]): DiffSegment[] {
+  const result = segments.map((s) => ({ ...s }))
+  for (let i = 0; i < result.length; i++) {
+    if (result[i].type === "equal") continue
+    if (isWhitespaceOnlySegment(result[i])) {
+      result[i] = { ...result[i], type: "equal" }
+    } else {
+      break
+    }
+  }
+  for (let i = result.length - 1; i >= 0; i--) {
+    if (result[i].type === "equal") continue
+    if (isWhitespaceOnlySegment(result[i])) {
+      result[i] = { ...result[i], type: "equal" }
+    } else {
+      break
+    }
+  }
+  return result
+}
+
 /**
  * 無視オプションを適用する。
  * trim 後にテキストが一致する行は差分を neutralize して equal 扱いにする。
+ * 内容差分がある行でも先頭・末尾の空白差分は neutralize する。
  */
 function applyIgnoreOptions(rows: DiffRowModel[], options: IgnoreOptions): DiffRowModel[] {
   return rows.map((row) => {
@@ -431,6 +459,11 @@ function applyIgnoreOptions(rows: DiffRowModel[], options: IgnoreOptions): DiffR
       const textA = segmentsToText(row.a.segments).trim()
       const textB = segmentsToText(row.b.segments).trim()
       if (textA === textB) return neutralizeRow(row)
+      return {
+        ...row,
+        a: { segments: neutralizeEdgeWhitespace(row.a.segments) },
+        b: { segments: neutralizeEdgeWhitespace(row.b.segments) },
+      }
     }
 
     return row

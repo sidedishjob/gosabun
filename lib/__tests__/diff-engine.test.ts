@@ -394,5 +394,72 @@ describe("computeDiff", () => {
         result.rows.some((r) => r.b.segments.some((s) => s.type !== "equal"))
       expect(hasDiff).toBe(true)
     })
+
+    it("neutralizes leading whitespace diff when content also differs", () => {
+      const result = computeDiff("\thello world", "  hello universe", "word", {
+        ignoreTrimWhitespace: true,
+      })
+      for (const row of result.rows) {
+        // 内容差分は残る
+        const hasDiff =
+          row.a.segments.some((s) => s.type !== "equal") ||
+          row.b.segments.some((s) => s.type !== "equal")
+        expect(hasDiff).toBe(true)
+        // 先頭の空白のみセグメントは equal になっている
+        for (const side of [row.a.segments, row.b.segments]) {
+          const firstNonEqual = side.find((s) => s.type !== "equal")
+          if (firstNonEqual) {
+            const text = firstNonEqual.tokens.map((t) => t.value).join("")
+            expect(text.trim()).not.toBe("")
+          }
+        }
+      }
+    })
+
+    it("neutralizes trailing whitespace diff when content also differs", () => {
+      const result = computeDiff("hello world  ", "hello universe\t", "word", {
+        ignoreTrimWhitespace: true,
+      })
+      for (const row of result.rows) {
+        const hasDiff =
+          row.a.segments.some((s) => s.type !== "equal") ||
+          row.b.segments.some((s) => s.type !== "equal")
+        expect(hasDiff).toBe(true)
+        // 末尾の空白のみセグメントは equal になっている
+        for (const side of [row.a.segments, row.b.segments]) {
+          const lastNonEqual = [...side].reverse().find((s) => s.type !== "equal")
+          if (lastNonEqual) {
+            const text = lastNonEqual.tokens.map((t) => t.value).join("")
+            expect(text.trim()).not.toBe("")
+          }
+        }
+      }
+    })
+
+    it("neutralizes both leading and trailing whitespace diff", () => {
+      const result = computeDiff("  hello world  ", "\thello universe\t", "word", {
+        ignoreTrimWhitespace: true,
+      })
+      for (const row of result.rows) {
+        for (const side of [row.a.segments, row.b.segments]) {
+          for (const seg of side) {
+            if (seg.type !== "equal") {
+              const text = seg.tokens.map((t) => t.value).join("")
+              expect(text.trim()).not.toBe("")
+            }
+          }
+        }
+      }
+    })
+
+    it("does not change behavior when there is no edge whitespace", () => {
+      const result = computeDiff("hello world", "hello universe", "word", {
+        ignoreTrimWhitespace: true,
+      })
+      const hasDiff =
+        result.rows.some((r) => r.a.segments.some((s) => s.type !== "equal")) ||
+        result.rows.some((r) => r.b.segments.some((s) => s.type !== "equal"))
+      expect(hasDiff).toBe(true)
+    })
   })
 })
