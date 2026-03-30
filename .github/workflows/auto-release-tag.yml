@@ -16,8 +16,9 @@ jobs:
     steps:
       - name: Extract version from PR title
         id: version
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
         run: |
-          TITLE="${{ github.event.pull_request.title }}"
           VERSION="${TITLE#release: }"
           echo "tag=$VERSION" >> "$GITHUB_OUTPUT"
 
@@ -41,7 +42,8 @@ jobs:
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.version.outputs.tag }}
         run: |
-          gh release create "${{ steps.version.outputs.tag }}" \
-            --title "${{ steps.version.outputs.tag }}" \
+          gh release create "${TAG}" \
+            --title "${TAG}" \
             --generate-notes
