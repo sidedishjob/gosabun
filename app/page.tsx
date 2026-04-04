@@ -66,6 +66,7 @@ export default function Home() {
   }, [restoreFromUndo, setResult, setResultVersion, setLastComparedOptions])
 
   const handleClear = () => {
+    if (textA.length === 0 && textB.length === 0) return
     handleClearAll(diffSnapshot)
     setResult(null)
   }
