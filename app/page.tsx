@@ -65,9 +65,15 @@ export default function Home() {
     setLastComparedOptions(state.lastComparedOptions)
   }, [restoreFromUndo, setResult, setResultVersion, setLastComparedOptions])
 
+  const handleClear = () => {
+    handleClearAll(diffSnapshot)
+    setResult(null)
+  }
+
   useKeyboardShortcuts({
     onCompare: handleCompare,
     onUndo: handleUndo,
+    onClear: handleClear,
   })
 
   /** Tailwind CSS のダークモードクラスを document に切り替える */
@@ -123,10 +129,7 @@ export default function Home() {
             onSwap={() => handleSwap(diffSnapshot)}
             isComparing={isComparing}
             onCompare={handleCompare}
-            onClear={() => {
-              handleClearAll(diffSnapshot)
-              setResult(null)
-            }}
+            onClear={handleClear}
           />
 
           <div
