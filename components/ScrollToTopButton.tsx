@@ -20,6 +20,7 @@ export function ScrollToTopButton() {
       }
     }
 
+    onScroll()
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
@@ -39,6 +40,7 @@ export function ScrollToTopButton() {
             visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-2 opacity-0"
           }`}
           onClick={scrollToTop}
+          tabIndex={visible ? 0 : -1}
           aria-label="トップへ戻る"
         >
           <ArrowUp className="h-4 w-4" />
