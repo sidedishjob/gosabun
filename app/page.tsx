@@ -15,6 +15,7 @@ import { OptionsBar } from "@/components/OptionsBar"
 import { DiffViewer } from "@/components/DiffViewer"
 import { StatsRow } from "@/components/StatsRow"
 import { ErrorBoundary } from "@/components/ErrorBoundary"
+import { ScrollToTopButton } from "@/components/ScrollToTopButton"
 import { useTextInput } from "@/hooks/useTextInput"
 import { useDiffCompare } from "@/hooks/useDiffCompare"
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts"
@@ -168,6 +169,8 @@ export default function Home() {
           )}
         </div>
       </div>
+
+      <ScrollToTopButton />
     </div>
   )
 }
