@@ -41,6 +41,7 @@ export function ScrollToTopButton() {
           }`}
           onClick={scrollToTop}
           tabIndex={visible ? 0 : -1}
+          aria-hidden={!visible}
           aria-label="トップへ戻る"
         >
           <ArrowUp className="h-4 w-4" />

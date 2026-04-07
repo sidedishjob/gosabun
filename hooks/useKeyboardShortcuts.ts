@@ -39,7 +39,7 @@ export function useKeyboardShortcuts({ onCompare, onUndo, onClear }: KeyboardSho
         e.preventDefault()
         undoRef.current()
       }
-      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.code === "KeyX") {
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === "x") {
         e.preventDefault()
         clearRef.current()
       }
