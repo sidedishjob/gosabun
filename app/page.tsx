@@ -15,6 +15,7 @@ import { OptionsBar } from "@/components/OptionsBar"
 import { DiffViewer } from "@/components/DiffViewer"
 import { StatsRow } from "@/components/StatsRow"
 import { ErrorBoundary } from "@/components/ErrorBoundary"
+import { ScrollToTopButton } from "@/components/ScrollToTopButton"
 import { useTextInput } from "@/hooks/useTextInput"
 import { useDiffCompare } from "@/hooks/useDiffCompare"
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts"
@@ -65,9 +66,16 @@ export default function Home() {
     setLastComparedOptions(state.lastComparedOptions)
   }, [restoreFromUndo, setResult, setResultVersion, setLastComparedOptions])
 
+  const handleClear = () => {
+    if (textA.length === 0 && textB.length === 0) return
+    handleClearAll(diffSnapshot)
+    setResult(null)
+  }
+
   useKeyboardShortcuts({
     onCompare: handleCompare,
     onUndo: handleUndo,
+    onClear: handleClear,
   })
 
   /** Tailwind CSS のダークモードクラスを document に切り替える */
@@ -123,10 +131,7 @@ export default function Home() {
             onSwap={() => handleSwap(diffSnapshot)}
             isComparing={isComparing}
             onCompare={handleCompare}
-            onClear={() => {
-              handleClearAll(diffSnapshot)
-              setResult(null)
-            }}
+            onClear={handleClear}
           />
 
           <div
@@ -164,6 +169,8 @@ export default function Home() {
           )}
         </div>
       </div>
+
+      <ScrollToTopButton />
     </div>
   )
 }

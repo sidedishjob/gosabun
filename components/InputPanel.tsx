@@ -309,14 +309,21 @@ export function InputPanel({
             <kbd className="font-mono text-[10px]">⌘+Enter</kbd>
           </TooltipContent>
         </Tooltip>
-        <Button
-          variant="ghost"
-          onClick={onClear}
-          disabled={textA.length === 0 && textB.length === 0}
-          className="text-muted-foreground"
-        >
-          クリア
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              onClick={onClear}
+              disabled={textA.length === 0 && textB.length === 0}
+              className="text-muted-foreground"
+            >
+              クリア
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            <kbd className="font-mono text-[10px]">⌘+Shift+X</kbd>
+          </TooltipContent>
+        </Tooltip>
       </div>
     </div>
   )
