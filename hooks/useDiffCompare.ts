@@ -60,12 +60,18 @@ export function useDiffCompare(
     }, 0)
   }, [textA, textB, wordMode, ignoreOptions, canCompare])
 
-  // オプション変更後に再比較を促すためのフラグ
-  const optionsChanged =
-    result !== null &&
-    lastComparedOptions !== null &&
-    (lastComparedOptions.wordMode !== wordMode ||
-      lastComparedOptions.ignoreOptions.ignoreTrimWhitespace !== ignoreOptions.ignoreTrimWhitespace)
+  // オプション変更後、result が既にある場合のみデバウンス付きで自動再比較する
+  useEffect(() => {
+    if (!result || !lastComparedOptions) return
+    const changed =
+      lastComparedOptions.wordMode !== wordMode ||
+      lastComparedOptions.ignoreOptions.ignoreTrimWhitespace !== ignoreOptions.ignoreTrimWhitespace
+    if (!changed) return
+    const debounceTimer = setTimeout(() => {
+      handleCompare()
+    }, 250)
+    return () => clearTimeout(debounceTimer)
+  }, [wordMode, ignoreOptions, result, lastComparedOptions, handleCompare])
 
   return {
     result,
@@ -75,7 +81,6 @@ export function useDiffCompare(
     isComparing,
     canCompare,
     handleCompare,
-    optionsChanged,
     lastComparedOptions,
     setLastComparedOptions,
   }

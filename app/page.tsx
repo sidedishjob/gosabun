@@ -49,7 +49,6 @@ export default function Home() {
     setResultVersion,
     isComparing,
     handleCompare,
-    optionsChanged,
     lastComparedOptions,
     setLastComparedOptions,
   } = useDiffCompare(textA, textB, wordMode, ignoreOptions)
@@ -148,14 +147,6 @@ export default function Home() {
               onDisplayModeChange={setDisplayMode}
               onIgnoreOptionsChange={setIgnoreOptions}
             />
-            {optionsChanged && (
-              <span className="text-xs text-muted-foreground animate-in fade-in duration-200">
-                <kbd className="mr-1 rounded border bg-muted px-1 py-0.5 font-mono text-[10px]">
-                  ⌘+Enter
-                </kbd>
-                で再比較
-              </span>
-            )}
           </div>
 
           {result && (
