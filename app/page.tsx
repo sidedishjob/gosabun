@@ -19,7 +19,6 @@ import { ScrollToTopButton } from "@/components/ScrollToTopButton"
 import { useTextInput } from "@/hooks/useTextInput"
 import { useDiffCompare } from "@/hooks/useDiffCompare"
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts"
-import { useModKeyLabel } from "@/hooks/usePlatform"
 import type { WordMode, Theme, DiffDisplayMode, IgnoreOptions, ColorMode } from "@/lib/types"
 
 export default function Home() {
@@ -50,12 +49,9 @@ export default function Home() {
     setResultVersion,
     isComparing,
     handleCompare,
-    optionsChanged,
     lastComparedOptions,
     setLastComparedOptions,
   } = useDiffCompare(textA, textB, wordMode, ignoreOptions)
-
-  const modKey = useModKeyLabel()
 
   // Undo 用に現在の差分状態をキャプチャする
   const diffSnapshot = { result, resultVersion, lastComparedOptions }
@@ -151,14 +147,6 @@ export default function Home() {
               onDisplayModeChange={setDisplayMode}
               onIgnoreOptionsChange={setIgnoreOptions}
             />
-            {optionsChanged && (
-              <span className="text-xs text-muted-foreground animate-in fade-in duration-200">
-                <kbd className="mr-1 rounded border bg-muted px-1 py-0.5 font-mono text-[10px]">
-                  {modKey}+Enter
-                </kbd>
-                で再比較
-              </span>
-            )}
           </div>
 
           {result && (
