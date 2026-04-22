@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 import { ArrowLeftRight, Upload, X } from "lucide-react"
 import { MAX_TEXT_LENGTH } from "@/lib/constants"
+import { useModKeyLabel } from "@/hooks/usePlatform"
 
 /** 受け付けるファイル拡張子 */
 const ACCEPTED_EXTENSIONS = [".txt", ".md", ".csv", ".json", ".xml", ".html"]
@@ -69,6 +70,7 @@ export function InputPanel({
   const overLimitA = textA.length > MAX_TEXT_LENGTH
   const overLimitB = textB.length > MAX_TEXT_LENGTH
   const canCompare = textA.length > 0 && textB.length > 0 && !overLimitA && !overLimitB
+  const modKey = useModKeyLabel()
 
   const [dragOverA, setDragOverA] = useState(false)
   const [dragOverB, setDragOverB] = useState(false)
@@ -306,7 +308,7 @@ export function InputPanel({
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom">
-            <kbd className="font-mono text-[10px]">⌘+Enter</kbd>
+            <kbd className="font-mono text-[10px]">{modKey}+Enter</kbd>
           </TooltipContent>
         </Tooltip>
         <Tooltip>
@@ -321,7 +323,7 @@ export function InputPanel({
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom">
-            <kbd className="font-mono text-[10px]">⌘+Shift+X</kbd>
+            <kbd className="font-mono text-[10px]">{modKey}+Shift+X</kbd>
           </TooltipContent>
         </Tooltip>
       </div>
