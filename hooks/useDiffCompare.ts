@@ -13,7 +13,7 @@ import type { WordMode, IgnoreOptions, DiffResult } from "@/lib/types"
 
 /**
  * テキスト差分比較の状態と実行ロジックを提供する。
- * @returns result / isComparing / optionsChanged など比較関連の状態一式
+ * @returns result / isComparing / lastComparedOptions など比較関連の状態一式
  */
 export function useDiffCompare(
   textA: string,
