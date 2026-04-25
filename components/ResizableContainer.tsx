@@ -86,6 +86,8 @@ export function ResizableContainer({ children, className }: ResizableContainerPr
       window.removeEventListener("pointermove", handlePointerMove)
       window.removeEventListener("pointerup", stopDragging)
       window.removeEventListener("pointercancel", stopDragging)
+      // ドラッグ中にアンマウントされた場合、body のインラインスタイルが残置されるのを防ぐ
+      stopDragging()
     }
   }, [handlePointerMove, stopDragging])
 
