@@ -7,7 +7,7 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react"
-import { GripVertical } from "lucide-react"
+import { GripVertical, Maximize2, Minimize2 } from "lucide-react"
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 
@@ -102,6 +102,17 @@ export function ResizableContainer({ children, className }: ResizableContainerPr
     [isDesktop, width]
   )
 
+  const isExpanded = width !== null && width > MIN_WIDTH_PX
+
+  const toggleExpanded = useCallback(() => {
+    if (isExpanded) {
+      setWidth(null)
+      return
+    }
+    const max = Math.max(MIN_WIDTH_PX, window.innerWidth - VIEWPORT_PADDING_PX)
+    setWidth(max)
+  }, [isExpanded])
+
   const style = isDesktop && width !== null ? { maxWidth: `${width}px` } : undefined
 
   // ハンドルはコンテナ右端（中央寄せ）に位置するよう、ビューポート右端からのオフセットを算出する
@@ -121,21 +132,41 @@ export function ResizableContainer({ children, className }: ResizableContainerPr
         >
           {/* 右端の常時可視な縦線 */}
           <div aria-hidden className="absolute inset-y-0 right-0 w-px bg-border" />
-          {/* グリップハンドル（縦中央に固定表示） */}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div
-                role="separator"
-                aria-orientation="vertical"
-                aria-label="コンテナ幅を変更"
-                onPointerDown={handlePointerDown}
-                className="pointer-events-auto absolute right-0 top-1/2 flex h-12 w-5 translate-x-1/2 -translate-y-1/2 cursor-col-resize touch-none items-center justify-center rounded-full border bg-background shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
-              >
-                <GripVertical className="h-3.5 w-3.5 text-muted-foreground" />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="left">ドラッグして幅を変更</TooltipContent>
-          </Tooltip>
+          {/* トグル + グリップ（縦中央に固定表示） */}
+          <div className="absolute right-0 top-1/2 flex -translate-y-1/2 translate-x-1/2 flex-col items-center gap-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={toggleExpanded}
+                  aria-label={isExpanded ? "コンテナ幅を初期値に戻す" : "コンテナ幅を最大化"}
+                  aria-pressed={isExpanded}
+                  className="pointer-events-auto flex h-7 w-5 items-center justify-center rounded-full border bg-background shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+                >
+                  {isExpanded ? (
+                    <Minimize2 className="h-3 w-3 text-muted-foreground" />
+                  ) : (
+                    <Maximize2 className="h-3 w-3 text-muted-foreground" />
+                  )}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="left">{isExpanded ? "最小化" : "最大化"}</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div
+                  role="separator"
+                  aria-orientation="vertical"
+                  aria-label="コンテナ幅を変更"
+                  onPointerDown={handlePointerDown}
+                  className="pointer-events-auto flex h-12 w-5 cursor-col-resize touch-none items-center justify-center rounded-full border bg-background shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+                >
+                  <GripVertical className="h-3.5 w-3.5 text-muted-foreground" />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="left">ドラッグして幅を変更</TooltipContent>
+            </Tooltip>
+          </div>
         </div>
       )}
     </>
