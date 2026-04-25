@@ -120,7 +120,9 @@ export function ResizableContainer({ children, className }: ResizableContainerPr
   // ハンドルはコンテナ右端（中央寄せ）に位置するよう、ビューポート右端からのオフセットを算出する
   const containerWidth = Math.min(viewportWidth, width ?? MIN_WIDTH_PX)
   const rightOffset = Math.max(0, (viewportWidth - containerWidth) / 2)
-  const showHandle = isDesktop && viewportWidth > 0
+  // 可変余地（最低でも 1px 拡張できる幅）がない場合はハンドル・トグルを表示しない。
+  // 表示しても max が MIN_WIDTH_PX に張り付き、操作しても幅が変わらず壊れて見えるため。
+  const showHandle = isDesktop && viewportWidth > MIN_WIDTH_PX + VIEWPORT_PADDING_PX
 
   return (
     <>
