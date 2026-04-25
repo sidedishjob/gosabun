@@ -16,6 +16,7 @@ import { DiffViewer } from "@/components/DiffViewer"
 import { StatsRow } from "@/components/StatsRow"
 import { ErrorBoundary } from "@/components/ErrorBoundary"
 import { ScrollToTopButton } from "@/components/ScrollToTopButton"
+import { ResizableContainer } from "@/components/ResizableContainer"
 import { useTextInput } from "@/hooks/useTextInput"
 import { useDiffCompare } from "@/hooks/useDiffCompare"
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts"
@@ -103,7 +104,7 @@ export default function Home() {
 
   return (
     <div>
-      <div className="mx-auto max-w-6xl px-4 py-4 md:py-6">
+      <ResizableContainer>
         <header className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-xl font-bold tracking-tight">gosabun</h1>
@@ -159,7 +160,7 @@ export default function Home() {
             </ErrorBoundary>
           )}
         </div>
-      </div>
+      </ResizableContainer>
 
       <ScrollToTopButton />
     </div>
