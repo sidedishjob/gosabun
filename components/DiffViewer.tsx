@@ -6,7 +6,7 @@
 "use client"
 
 import { useState, useMemo, useCallback, useRef } from "react"
-import { ChevronUp, ChevronDown } from "lucide-react"
+import { ChevronUp, ChevronDown, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { DiffResult, DiffRowModel, DiffDisplayMode } from "@/lib/types"
 import { DiffRow } from "./DiffRow"
@@ -94,8 +94,14 @@ export function DiffViewer({ result, displayMode }: DiffViewerProps) {
 
   if (changeIndices.length === 0) {
     return (
-      <div className="rounded-md border p-8 text-center text-sm text-muted-foreground">
-        差分はありません
+      <div
+        className="flex items-center justify-center gap-2 rounded-md border border-green-600/30 bg-green-600/5 p-4 text-center dark:border-green-400/30 dark:bg-green-400/5"
+        role="status"
+      >
+        <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" aria-hidden="true" />
+        <p className="text-sm font-medium text-green-700 dark:text-green-300">
+          完全に一致しています
+        </p>
       </div>
     )
   }
