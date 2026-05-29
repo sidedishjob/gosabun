@@ -102,6 +102,30 @@ export default function Home() {
     return () => observer.disconnect()
   }, [])
 
+  // 比較完了時、差分ナビゲーションバーが sticky 位置（OptionsBar 直下）に来るまで
+  // ページをスクロールし、初回クリックからバーの位置が変わらないようにする。
+  // Undo（resultVersion を過去値に戻す操作）では発火させない。
+  const diffViewerRef = useRef<HTMLDivElement>(null)
+  const prevResultVersionRef = useRef(resultVersion)
+  useEffect(() => {
+    const prev = prevResultVersionRef.current
+    prevResultVersionRef.current = resultVersion
+    if (resultVersion <= prev) return
+    if (!result) return
+    const el = diffViewerRef.current
+    if (!el) return
+
+    const stickyTopRaw = getComputedStyle(document.documentElement).getPropertyValue(
+      "--sticky-bar-height"
+    )
+    const stickyTop = parseFloat(stickyTopRaw) || 40
+    const targetY = el.getBoundingClientRect().top + window.scrollY - stickyTop
+    if (window.scrollY >= targetY) return
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    window.scrollTo({ top: targetY, behavior: prefersReducedMotion ? "auto" : "smooth" })
+  }, [resultVersion, result])
+
   return (
     <div>
       <ResizableContainer>
@@ -152,7 +176,9 @@ export default function Home() {
 
           {result && (
             <ErrorBoundary>
-              <DiffViewer key={resultVersion} result={result} displayMode={displayMode} />
+              <div ref={diffViewerRef}>
+                <DiffViewer key={resultVersion} result={result} displayMode={displayMode} />
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <StatsRow label="テキスト A" stats={result.statsA} />
                 <StatsRow label="テキスト B" stats={result.statsB} />
