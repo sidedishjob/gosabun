@@ -25,6 +25,7 @@ interface DiffViewerProps {
 }
 
 export function DiffViewer({ result, displayMode }: DiffViewerProps) {
+  const wrapperRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [currentChangeIdx, setCurrentChangeIdx] = useState(-1)
 
@@ -47,22 +48,41 @@ export function DiffViewer({ result, displayMode }: DiffViewerProps) {
     [displayRows]
   )
 
-  /** 指定した変更箇所インデックスの行までスクロールする */
+  /**
+   * 指定した変更箇所インデックスの行までスクロールする。
+   * 基本は対象行を viewport 中央に寄せるが、ナビゲーションバーが sticky 位置から
+   * 外れない最小 scrollY でクランプし、バーの画面位置が動かないようにする。
+   */
   const scrollToRow = useCallback(
     (changeIdx: number) => {
-      if (!containerRef.current || changeIdx < 0 || changeIdx >= changeIndices.length) return
+      if (!containerRef.current || !wrapperRef.current) return
+      if (changeIdx < 0 || changeIdx >= changeIndices.length) return
       const displayIdx = changeIndices[changeIdx]
       const target = containerRef.current.querySelector<HTMLElement>(
         `[data-diff-changed="${displayRows[displayIdx].originalIndex}"]`
       )
-      if (target) {
-        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-        target.scrollIntoView({
-          behavior: prefersReducedMotion ? "auto" : "smooth",
-          block: "center",
-        })
-        setCurrentChangeIdx(changeIdx)
-      }
+      if (!target) return
+
+      const stickyTopRaw = getComputedStyle(document.documentElement).getPropertyValue(
+        "--sticky-bar-height"
+      )
+      const stickyTop = parseFloat(stickyTopRaw) || 40
+
+      const targetRect = target.getBoundingClientRect()
+      const wrapperRect = wrapperRef.current.getBoundingClientRect()
+      // 中央寄せの理想 scrollY
+      const idealScrollY =
+        targetRect.top + window.scrollY - (window.innerHeight - targetRect.height) / 2
+      // バー（= wrapper の先頭）が sticky 位置に貼り付く最小 scrollY
+      const minScrollY = wrapperRect.top + window.scrollY - stickyTop
+      const finalScrollY = Math.max(idealScrollY, minScrollY)
+
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      window.scrollTo({
+        top: finalScrollY,
+        behavior: prefersReducedMotion ? "auto" : "smooth",
+      })
+      setCurrentChangeIdx(changeIdx)
     },
     [changeIndices, displayRows]
   )
@@ -107,7 +127,7 @@ export function DiffViewer({ result, displayMode }: DiffViewerProps) {
   }
 
   return (
-    <div className="space-y-2">
+    <div ref={wrapperRef} className="space-y-2">
       <div
         className="sticky z-5 flex items-center gap-1.5 bg-background py-1 text-xs text-muted-foreground"
         style={{ top: "var(--sticky-bar-height, 2.5rem)" }}
